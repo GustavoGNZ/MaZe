@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+*.vscode
 
 # Object files
 *.o
@@ -11,6 +12,7 @@
 *.ilk
 *.map
 *.exp
+
 
 # Precompiled Headers
 *.gch
@@ -51,4 +53,3 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-*maze
