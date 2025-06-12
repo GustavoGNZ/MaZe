@@ -1,6 +1,13 @@
 # ♟️ MaZe – Chess Engine
 
-**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), com foco na construção de uma base modular e eficiente para representação de estados e geração de jogadas usando bitboards.
+![Build](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)
+![Language](https://img.shields.io/badge/language-C-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-Academic-lightgrey?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-Linux--friendly-important?style=flat-square)
+![Status](https://img.shields.io/badge/status-WIP-yellow?style=flat-square)
+
+**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), com foco na construção de uma base modular e eficiente para representação de estados e geração de jogadas usando bitboards.O nome surgiu da junção dos nomes das duas pessoas mais importantes da minha vida: minha mãe Marta e meu pai José, que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
+
 
 ---
 
@@ -59,5 +66,3 @@ make
 ### Windows
 
 Em breve.
-
-O nome MaZe surgiu de inspiração das duas pessoas mais importantes em minha vida, minha mãe e meu pai Marta e José que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
