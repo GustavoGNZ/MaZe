@@ -9,16 +9,7 @@ Este projeto tem como objetivo estudar e implementar os princípios fundamentais
 - Representação de peças e tabuleiro com bitboards.
 - Geração de ataques préviamente computadas
 - Uso de técnicas de otimização e possibilidade de análise de algoritmos como Minimax, Alpha-Beta Pruning.
-- 
-## 🗂 Estrutura de Arquivos
-
-Maze/
-├── ataques.c         # Geração de ataques
-├── ataques.h
-├── bitboard.c        # Funções utilitárias de bitboard
-├── bitboard.h
-├── maze.c            # Função principal da engine
-├── Makefile          # Compilação 
+  
 
 ## ⚙️ Compilação
 
