@@ -4,7 +4,9 @@
 ![Language](https://img.shields.io/badge/language-C-blue?style=flat-square)
 
 
-**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), com foco na construção de uma base modular e eficiente para representação de estados e geração de jogadas usando bitboards.O nome surgiu da junção dos nomes das duas pessoas mais importantes da minha vida: minha mãe Marta e meu pai José, que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
+**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), com foco na construção de uma base modular e eficiente para representação de estados e geração de jogadas usando bitboards.
+
+O nome surgiu da junção dos nomes das duas pessoas mais importantes da minha vida: minha mãe Marta e meu pai José, que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
 
 
 ---
