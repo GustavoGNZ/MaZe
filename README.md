@@ -55,11 +55,9 @@ cd maze
 make
 ./maze
 ```
-## 👨‍💻 Autor
 
-Gustavo Henrique Trassi Ganaza
-Aluno de [Ciência da Computação] – [Universidade Estadual de Maringá]  
-TCC orientado por [Daniel Kikuti]
+### Windows
 
+Em breve.
 
 O nome MaZe surgiu de inspiração das duas pessoas mais importantes em minha vida, minha mãe e meu pai Marta e José que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
