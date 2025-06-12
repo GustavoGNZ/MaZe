@@ -63,10 +63,3 @@ make
 ./maze
 ```
 
-### Windows
-
-<<<<<<< HEAD
-Em breve.
-=======
-Em breve.
->>>>>>> e92da1131c203fcc5b18e820239ad35c0f1238c4
