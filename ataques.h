@@ -15,6 +15,8 @@ u64 gerar_ataque_cavalo(int casa);
 u64 gerar_ataque_rei(int casa);
 u64 gerar_ataque_bispo(int casa);
 u64 gerar_ataque_torre(int casa);
+u64 gerar_ataque_bispo_tempo_real(int casa, u64 bitboard);
+u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard);
 void gerar_ataques_pecas();
 
 #endif

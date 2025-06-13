@@ -109,13 +109,11 @@ u64 gerar_ataque_rei(int casa)
     return ataque;
 }
 
+// Gera o bitboard de ataques possíveis de um bispo a partir da casa fornecida
 u64 gerar_ataque_bispo(int casa)
 {
 
     u64 ataque = 0ULL;
-    u64 bitboard = 0ULL;
-
-    setBit(bitboard, casa); // Marca a casa atual do peão
 
     int linha = casa / 8;  // linha (0 = primeira, 7 = oitava)
     int coluna = casa % 8; // coluna (0 = 'a', 7 = 'h')
@@ -163,13 +161,11 @@ u64 gerar_ataque_bispo(int casa)
     return ataque;
 }
 
+// Gera o bitboard de ataques possíveis de uma torre a partir da casa fornecida
 u64 gerar_ataque_torre(int casa)
 {
 
     u64 ataque = 0ULL;
-    u64 bitboard = 0ULL;
-
-    setBit(bitboard, casa); // Marca a casa atual do peão
 
     int linha = casa / 8;  // linha (0 = primeira, 7 = oitava)
     int coluna = casa % 8; // coluna (0 = 'a', 7 = 'h')
@@ -208,6 +204,104 @@ u64 gerar_ataque_torre(int casa)
             int nova_casa = proxima_linha * 8 + proxima_coluna;
             setBit(ataque, nova_casa); // Marca a casa como atacada
 
+            nova_linha = proxima_linha;
+            nova_coluna = proxima_coluna;
+        }
+    }
+
+    return ataque;
+}
+
+u64 gerar_ataque_bispo_tempo_real(int casa, u64 bitboard)
+{
+
+    u64 ataque = 0ULL;
+
+    int linha = casa / 8;  // linha (0 = primeira, 7 = oitava)
+    int coluna = casa % 8; // coluna (0 = 'a', 7 = 'h')
+
+    // Deslocamentos diagonais
+    int deslocamentos[4][2] = {
+        {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+
+    // Para cada direção diagonal
+    for (int i = 0; i < 4; i++)
+    {
+        int nova_linha = linha;
+        int nova_coluna = coluna;
+
+        // Continua movendo na direção até o final do tabuleiro
+        while (1)
+        {
+            int proxima_linha = nova_linha + deslocamentos[i][0];
+            int proxima_coluna = nova_coluna + deslocamentos[i][1];
+
+            // Se sair do tabuleiro, para
+            if (proxima_linha < 0 || proxima_linha >= 8 || proxima_coluna < 0 || proxima_coluna >= 8)
+            {
+                break;
+            }
+
+            int nova_casa = proxima_linha * 8 + proxima_coluna;
+            if (getBit(bitboard, nova_casa))
+            {
+                // Se a casa já está ocupada, para
+                break;
+            }
+            else
+            {
+
+                setBit(ataque, nova_casa); // Marca a casa como atacada
+            }
+            nova_linha = proxima_linha;
+            nova_coluna = proxima_coluna;
+        }
+    }
+
+    return ataque;
+}
+
+u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard)
+{
+
+    u64 ataque = 0ULL;
+
+    int linha = casa / 8;  // linha (0 = primeira, 7 = oitava)
+    int coluna = casa % 8; // coluna (0 = 'a', 7 = 'h')
+
+    // Deslocamentos verticais e horizontais
+    int deslocamentos[4][2] = {
+        {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+
+    // Para cada direção
+    for (int i = 0; i < 4; i++)
+    {
+        int nova_linha = linha;
+        int nova_coluna = coluna;
+
+        // Continua movendo na direção até o final do tabuleiro
+        while (1)
+        {
+            int proxima_linha = nova_linha + deslocamentos[i][0];
+            int proxima_coluna = nova_coluna + deslocamentos[i][1];
+
+            // Se sair do tabuleiro, para
+            if (proxima_linha < 0 || proxima_linha >= 8 || proxima_coluna < 0 || proxima_coluna >= 8)
+            {
+                break;
+            }
+
+            int nova_casa = proxima_linha * 8 + proxima_coluna;
+            if (getBit(bitboard, nova_casa))
+            {
+                // Se a casa já está ocupada, para
+                break;
+            }
+            else
+            {
+
+                setBit(ataque, nova_casa); // Marca a casa como atacada
+            }
             nova_linha = proxima_linha;
             nova_coluna = proxima_coluna;
         }
