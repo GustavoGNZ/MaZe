@@ -6,6 +6,29 @@ u64 tabela_ataques_rei[64];
 u64 tabela_ataques_bispo[64];
 u64 tabela_ataques_torre[64];
 
+// gerado usando um for que percorre todas as casas do tabuleiro e conta os bits de cada retorno da funcao gerar_ataque_bispo e gerar_ataque_torre
+const int bits_relevantes_bispo[64] = {
+    6, 5, 5, 5, 5, 5, 5, 6, 
+    5, 5, 5, 5, 5, 5, 5, 5, 
+    5, 5, 7, 7, 7, 7, 5, 5, 
+    5, 5, 7, 9, 9, 7, 5, 5, 
+    5, 5, 7, 9, 9, 7, 5, 5, 
+    5, 5, 7, 7, 7, 7, 5, 5, 
+    5, 5, 5, 5, 5, 5, 5, 5, 
+    6, 5, 5, 5, 5, 5, 5, 6
+};
+
+const int bits_relevantes_torre[64] = {
+    12, 11, 11, 11, 11, 11, 11, 12, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    11, 10, 10, 10, 10, 10, 10, 11, 
+    12, 11, 11, 11, 11, 11, 11, 12   
+};
+
 // Gera o bitboard de ataques possíveis de um peão a partir da casa fornecida
 u64 gerar_ataque_peao(int lado, int casa)
 {
@@ -330,3 +353,32 @@ void gerar_ataques_pecas()
         tabela_ataques_torre[casa] = gerar_ataque_torre(casa);
     }
 }
+
+/**
+ * @brief Gera um bitboard de ocupação baseado em um índice, quantidade de bits e uma máscara.
+ *
+ * Esta função cria um bitboard (ocupação) mapeando os bits do índice fornecido
+ * para as posições dos bits setados na máscara. Para cada bit setado na máscara,
+ * se o bit correspondente no índice estiver setado, a função seta esse bit no bitboard de ocupação.
+ *
+ * @param index        Índice representando a variação de ocupação (geralmente de 0 até 2^qtde_bits - 1).
+ * @param qtde_bits    Quantidade de bits relevantes a considerar da máscara.
+ * @param mask         Máscara de bitboard indicando as casas relevantes.
+ * @return u64         Bitboard de ocupação resultante.
+ */
+u64 set_occupancy(int index, int qtde_bits, u64 mask){
+    u64 occupancy = 0ULL;
+    for (int i = 0; i < qtde_bits; i++)
+    {
+        int casa = getLeastBitIndex(mask);
+        
+        clearBit(mask, casa); // Remove a casa do mask
+
+        if (index & (1ULL << i))
+        {
+            setBit(occupancy, casa); // Marca a casa no occupancy
+        }
+    }
+    return occupancy;
+}
+
