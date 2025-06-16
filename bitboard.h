@@ -8,6 +8,13 @@
 #define getBit(bitboard, casa) ((bitboard & (1ULL << casa)))
 #define setBit(bitboard, casa) (bitboard |= (1ULL << casa))
 #define clearBit(bitboard, casa) (bitboard &= ~(1ULL << casa))
+#define getLeastBitIndex(bitboard) (__builtin_ctzll(bitboard)) // Retorna o índice do bit menos significativo
+
+extern const char *casa_nome[]; // Mapeamento de casas do tabuleiro
+
+// Função de utilitário
+void printBitboard(u64 bitboard);
+int contarBits(u64 bitboard);
 
 // Enumerações para casas e lados
 enum { a1, b1, c1, d1, e1, f1, g1, h1,
@@ -21,7 +28,5 @@ enum { a1, b1, c1, d1, e1, f1, g1, h1,
 
 enum { branco, preto };
 
-// Função de utilitário
-void printBitboard(u64 bitboard);
 
 #endif
