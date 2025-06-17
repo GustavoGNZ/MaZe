@@ -19,7 +19,8 @@ u64 gerar_ataque_bispo(int casa);
 u64 gerar_ataque_torre(int casa);
 u64 gerar_ataque_bispo_tempo_real(int casa, u64 bitboard);
 u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard);
-void gerar_ataques_pecas();
+unsigned int gerarNumeroAleatorio();
 u64 set_occupancy(int index, int qtde_bits, u64 mask);
+void gerar_ataques_pecas();
 
 #endif

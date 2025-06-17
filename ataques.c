@@ -333,27 +333,6 @@ u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard)
     return ataque;
 }
 
-// Gera os ataques pré-definidos para as peças
-void gerar_ataques_pecas()
-{
-    for (int casa = 0; casa < 64; casa++)
-    {
-        // peões
-        tabela_ataques_peao[branco][casa] = gerar_ataque_peao(branco, casa);
-        tabela_ataques_peao[preto][casa] = gerar_ataque_peao(preto, casa);
-
-        // cavalo
-        tabela_ataques_cavalo[casa] = gerar_ataque_cavalo(casa);
-
-        // rei
-        tabela_ataques_rei[casa] = gerar_ataque_rei(casa);
-
-        // bispo e torre
-        tabela_ataques_bispo[casa] = gerar_ataque_bispo(casa);
-        tabela_ataques_torre[casa] = gerar_ataque_torre(casa);
-    }
-}
-
 /**
  * @brief Gera um bitboard de ocupação baseado em um índice, quantidade de bits e uma máscara.
  *
@@ -381,4 +360,44 @@ u64 set_occupancy(int index, int qtde_bits, u64 mask){
     }
     return occupancy;
 }
+
+// Variável global para armazenar o estado do gerador de números aleatórios
+unsigned int num_aleatorio = 1804289383;
+
+// Gera um número aleatório usando xorshift32 (um gerador de números pseudo-aleatórios) foi criado assim para rodar em windows e linux pela diferenca na funcao rand() e random()
+unsigned int gerarNumeroAleatorio()
+{
+    unsigned int num = num_aleatorio;
+
+    // xorshift32
+    num ^= num << 13;
+    num ^= num >> 17;
+    num ^= num << 5;
+
+    num_aleatorio = num; // Atualiza o estado global
+
+    return num;
+};
+
+// Gera os ataques pré-definidos para as peças
+void gerar_ataques_pecas()
+{
+    for (int casa = 0; casa < 64; casa++)
+    {
+        // peões
+        tabela_ataques_peao[branco][casa] = gerar_ataque_peao(branco, casa);
+        tabela_ataques_peao[preto][casa] = gerar_ataque_peao(preto, casa);
+
+        // cavalo
+        tabela_ataques_cavalo[casa] = gerar_ataque_cavalo(casa);
+
+        // rei
+        tabela_ataques_rei[casa] = gerar_ataque_rei(casa);
+
+        // bispo e torre
+        tabela_ataques_bispo[casa] = gerar_ataque_bispo(casa);
+        tabela_ataques_torre[casa] = gerar_ataque_torre(casa);
+    }
+}
+
 
