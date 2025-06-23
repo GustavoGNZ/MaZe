@@ -11,11 +11,15 @@ extern u64 tabela_ataques_bispo[64];
 extern u64 tabela_ataques_torre[64];
 extern const int bits_relevantes_bispo[64];
 extern const int bits_relevantes_torre[64];
+extern const u64 magics_bispo[64];
+extern const u64 magics_torre[64];
 
 // Funcoes de geração de números aleatórios
 unsigned int gerarNumeroAleatorio32bits();
 u64 gerarNumeroAleatorio64bits();
 u64 gerarMagicNumber();
+u64 find_magic_number(int casa, int bits_relevantes, int peca);
+void init_magic_numbers();
 
 // Verifica se a casa está dentro do tabuleiro
 int dentro_do_tabuleiro(int linha, int coluna);

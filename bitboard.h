@@ -27,6 +27,6 @@ enum { a1, b1, c1, d1, e1, f1, g1, h1,
        a8, b8, c8, d8, e8, f8, g8, h8 };
 
 enum { branco, preto };
-
+enum { peao, cavalo, bispo, torre, dama, rei };
 
 #endif
