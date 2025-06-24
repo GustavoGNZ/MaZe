@@ -32,140 +32,13 @@ const int bits_relevantes_torre[64] = {
 };
 
 // gerado usando init_magic_numbers() 
-const u64 magics_bispo[64] = {
-    0x10c4048800000082ULL,
-    0x10800100021400ULL,
-    0x1420810000a00000ULL,
-    0x4a80040000042ULL,
-    0x4800a09006000810ULL,
-    0x8143010101002000ULL,
-    0x540004900470302ULL,
-    0x908088161ULL,
-    0x10026001364808ULL,
-    0x800380000088812ULL,
-    0x8048a000080000ULL,
-    0xa012028400108002ULL,
-    0x200044000e020008ULL,
-    0x504010a040410720ULL,
-    0x8000001b84044881ULL,
-    0x800000118c01000ULL,
-    0x244661004c080821ULL,
-    0x22240820802201eULL,
-    0x10008180800400ULL,
-    0x940000900081824ULL,
-    0x1800012898000018ULL,
-    0x5010200000641000ULL,
-    0x62040981c0001032ULL,
-    0x21000401290040ULL,
-    0x100e000202108000ULL,
-    0x704840810202ULL,
-    0x9558000000081ULL,
-    0x4002000c80840040ULL,
-    0x20d2000200040800ULL,
-    0x821011000000ULL,
-    0x14001808180231ULL,
-    0x8012481000210800ULL,
-    0x910009408028010ULL,
-    0x80021408687ULL,
-    0x400009201000210ULL,
-    0x300000480010008ULL,
-    0x108002a100101ULL,
-    0x901200524402a00ULL,
-    0x1000c00220604880ULL,
-    0x100000c010140ULL,
-    0x410041240190800ULL,
-    0x1804000b00810100ULL,
-    0x2400400200b010ULL,
-    0x50001002200c020ULL,
-    0x1820282000348420ULL,
-    0x1110204002440080ULL,
-    0x1400440000ac2238ULL,
-    0x28c804440208004ULL,
-    0x402cc680a028c010ULL,
-    0xa00018800004ULL,
-    0x8400001208010100ULL,
-    0x1020408a00844408ULL,
-    0x5200c28160214800ULL,
-    0xa1229804ULL,
-    0x5005002820000ULL,
-    0x8530400011240200ULL,
-    0x8000004210c00002ULL,
-    0x40080286082ULL,
-    0x8000000000442220ULL,
-    0x1000000200840251ULL,
-    0x500020122820600ULL,
-    0x100301210608ULL,
-    0x840400580000048ULL,
-    0x2ac0402982000040ULL,
+u64 magics_bispo[64] = {
+
 };
 
 
 // gerado usando init_magic_numbers() 
-const u64 magics_torre[64] = {
-    0x780a080080080056ULL,
-    0x4000440621811200ULL,
-    0xc00000e00a000500ULL,
-    0x6400411200444402ULL,
-    0x2840122001050000ULL,
-    0x402800018080192ULL,
-    0x140008048000100ULL,
-    0x9000200289008000ULL,
-    0xa00880900000eaULL,
-    0x10040080124022ULL,
-    0x8061840001108005ULL,
-    0x200520402014140ULL,
-    0x1400063040000ULL,
-    0x400032040004ULL,
-    0x895a0000120ULL,
-    0x8e00102ULL,
-    0x1013748002001002ULL,
-    0x9000988000000010ULL,
-    0x44501200012088c4ULL,
-    0x20670412015020ULL,
-    0x84b0080800100009ULL,
-    0x9040200020002110ULL,
-    0xa00000004c21100ULL,
-    0x8004012800a0000ULL,
-    0x5010040002558250ULL,
-    0x800a204000110010ULL,
-    0x8302420c01084200ULL,
-    0x8110888004010ULL,
-    0x4c0088200004c241ULL,
-    0x8040200508000010ULL,
-    0x8009005282000428ULL,
-    0x2804140008080ULL,
-    0x408240100a000120ULL,
-    0x40810004022a830ULL,
-    0x3002054040004005ULL,
-    0x300004090020800ULL,
-    0x840048102080000ULL,
-    0x8004000c2024090ULL,
-    0x61200000080c000aULL,
-    0x41480210000420ULL,
-    0x830000b5008004ULL,
-    0x2280000040410040ULL,
-    0x80004001020000ULL,
-    0x1000100010010000ULL,
-    0x5201400820a6002ULL,
-    0x604000800001280ULL,
-    0x114220200104005ULL,
-    0xa0001200000c020ULL,
-    0x110c820900042450ULL,
-    0x2015002405000ULL,
-    0x2605400040003000ULL,
-    0x200020200202ULL,
-    0x9600810020002009ULL,
-    0xa000000002001200ULL,
-    0x4a8008094201100ULL,
-    0xc2008000000060ULL,
-    0x80b1428200040040ULL,
-    0xc8408402000048ULL,
-    0x18224400002d0480ULL,
-    0x2040000906002001ULL,
-    0x1410020c0104ULL,
-    0x81861cc01800000ULL,
-    0x1208215000040ULL,
-    0x228005040004ULL,
+u64 magics_torre[64] = {
 };
 
 
@@ -240,7 +113,7 @@ u64 find_magic_number(int casa, int bits_relevantes, int peca){
     }
 
     // 1048576 = 2^20 escolhido arbitrariamente para o tamanho do array de ataques usados
-    for(int j = 0; j < 1048576; j++){
+    for(int j = 0; j < 100000000; j++){
 
         u64 magic_number = gerarMagicNumber();
 
@@ -251,38 +124,34 @@ u64 find_magic_number(int casa, int bits_relevantes, int peca){
 
         memset(ataques_usados, 0ULL, sizeof(ataques_usados)); // Limpa o array de ataques usados
 
-        int indice, valido;
+        int indice, erro;
 
-        for(indice = 0, valido = 0; !valido && indice < indices_ocupacao; indice++) {
+        for(indice = 0, erro = 0; !erro && indice < indices_ocupacao; indice++) {
             // Calcula o índice de ataque usando o magic number
-            int index = (ocupacoes[indice] * magic_number) >> (64 - bits_relevantes);
+            int index_magico = (int)((ocupacoes[indice] * magic_number) >> (64 - bits_relevantes));
 
             // Verifica se o ataque já foi usado
-            if (ataques_usados[index] == 0ULL) {
-                ataques_usados[index] = ataques[indice]; // Marca o ataque como usado
-                valido = 1; // Marca como válido
-            } else if (ataques_usados[index] != ataques[indice]) {
-                valido = 0; // Se o ataque já foi usado e é diferente, invalida o magic number
+            if (ataques_usados[index_magico] == 0ULL) {
+                ataques_usados[index_magico] = ataques[indice]; // Marca o ataque como usado
+            } else if (ataques_usados[index_magico] != ataques[indice]) {
+                erro = 1; // Se o ataque já foi usado e é diferente, invalida o magic number
             }
         }
-        if (valido) {
-            return magic_number;
-        }
-        return 0ULL; // Se não encontrou um magic number válido, retorna 0
+        // funciona
+        if (!erro) return magic_number;
+
     }
 
+    return 0ULL; // Se não encontrou um magic number válido, retorna 0
 }
 
 // gera magic numbers hard coded para bispo e torre
 void init_magic_numbers() {
     // Inicializa os magic numbers para bispo e torre
     for (int casa = 0; casa < 64; casa++) {
-        u64 magic_bispo = find_magic_number(casa, bits_relevantes_bispo[casa], bispo);
-        u64 magic_torre = find_magic_number(casa, bits_relevantes_torre[casa], torre);
-
-            printf(" 0x%llxULL,\n",magic_bispo);
-            printf(" 0x%llxULL,\n",magic_torre);
-
+        magics_bispo[casa] = find_magic_number(casa, bits_relevantes_bispo[casa], bispo);
+        magics_torre[casa] = find_magic_number(casa, bits_relevantes_torre[casa], torre);
+    
     }
 }
 
