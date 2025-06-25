@@ -1,4 +1,2 @@
 all:
-	gcc -Ofast -o maze maze.c bitboard.c ataques.c
-debug:
-	gcc -g -o maze maze.c bitboard.c ataques.c
+	gcc -Ofast -Iinclude -o maze src/maze.c src/bitboard.c src/ataques.c src/globals.c

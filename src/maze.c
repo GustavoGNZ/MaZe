@@ -1,5 +1,6 @@
-#include "bitboard.h"
-#include "ataques.h"
+#include "../include/bitboard.h"
+#include "../include/ataques.h"
+#include "../include/globals.h"
 #include <stdio.h>
 #include <stdlib.h>
 

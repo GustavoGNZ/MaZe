@@ -3,17 +3,6 @@
 
 #include "bitboard.h"
 
-// Variaveis globais para armazenar os ataques pré-definidos de cada peça
-extern u64 tabela_ataques_peao[2][64];
-extern u64 tabela_ataques_cavalo[64];
-extern u64 tabela_ataques_rei[64];
-extern u64 tabela_ataques_bispo[64];
-extern u64 tabela_ataques_torre[64];
-extern const int bits_relevantes_bispo[64];
-extern const int bits_relevantes_torre[64];
-extern  u64 magics_bispo[64];
-extern  u64 magics_torre[64];
-
 // Funcoes de geração de números aleatórios
 unsigned int gerarNumeroAleatorio32bits();
 u64 gerarNumeroAleatorio64bits();
@@ -31,7 +20,7 @@ void marcar_ataque_direcional_tempo_real(u64 *ataque, int linha, int coluna, int
 
 
 // Gera os ataques pré-definidos para as peças
-void gerar_ataques_pecas();
+void init_ataques_pecas();
 u64 gerar_ataque_peao(int lado, int casa);
 u64 gerar_ataque_cavalo(int casa);
 u64 gerar_ataque_rei(int casa);

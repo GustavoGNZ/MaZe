@@ -1,4 +1,4 @@
-#include "bitboard.h"
+#include "../include/bitboard.h"
 
 const char *casa_nome[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
@@ -8,9 +8,7 @@ const char *casa_nome[] = {
     "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
     "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
-};
-
+    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"};
 
 // Imprime o bitboard que representa o tabuleiro de xadrez.
 void printBitboard(u64 bitboard)
@@ -25,7 +23,7 @@ void printBitboard(u64 bitboard)
             int casa = linha * 8 + coluna;
 
             if (getBit(bitboard, casa))
-{
+            {
                 printf(" 1 ");
             }
             else
