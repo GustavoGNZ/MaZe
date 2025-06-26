@@ -43,7 +43,7 @@ u64 gerarMagicNumber()
     return gerarNumeroAleatorio64bits() & gerarNumeroAleatorio64bits() & gerarNumeroAleatorio64bits();
 }
 
-u64 find_magic_number(int casa, int bits_relevantes, int peca)
+u64 encontrarMagicNumber(int casa, int bits_relevantes, int peca)
 {
     u64 ocupacoes[4096];      // Array para armazenar ocupações
     u64 ataques[4096];        // Array para armazenar ataques
@@ -53,11 +53,11 @@ u64 find_magic_number(int casa, int bits_relevantes, int peca)
 
     if (peca == bispo)
     {
-        ataque_peca = gerar_ataque_bispo(casa);
+        ataque_peca = gerarAtaquesBispo(casa);
     }
     else if (peca == torre)
     {
-        ataque_peca = gerar_ataque_torre(casa);
+        ataque_peca = gerarAtaquesTorre(casa);
     }
     else
     {
@@ -75,11 +75,11 @@ u64 find_magic_number(int casa, int bits_relevantes, int peca)
         // Calcula o ataque para a ocupação atual
         if (peca == bispo)
         {
-            ataques[i] = gerar_ataque_bispo_tempo_real(casa, ocupacoes[i]);
+            ataques[i] = gerarAtaquesBispoComBloqueio(casa, ocupacoes[i]);
         }
         else if (peca == torre)
         {
-            ataques[i] = gerar_ataque_torre_tempo_real(casa, ocupacoes[i]);
+            ataques[i] = gerarAtaquesTorreComBloqueio(casa, ocupacoes[i]);
         }
     }
 
@@ -122,36 +122,36 @@ u64 find_magic_number(int casa, int bits_relevantes, int peca)
 }
 
 // gera magic numbers hard coded para bispo e torre (a ordem importa pois a aleatoriadade eh pseudo-aleatória)
-void init_magic_numbers()
+void inicializarMagicNumbers()
 {
     // Inicializa os magic numbers para bispo e torre
     for (int casa = 0; casa < 64; casa++)
     {
-        magics_torre[casa] = find_magic_number(casa, bits_relevantes_torre[casa], torre);
+        magics_torre[casa] = encontrarMagicNumber(casa, bits_relevantes_torre[casa], torre);
     }
     for (int casa = 0; casa < 64; casa++)
     {
-        magics_bispo[casa] = find_magic_number(casa, bits_relevantes_bispo[casa], bispo);
+        magics_bispo[casa] = encontrarMagicNumber(casa, bits_relevantes_bispo[casa], bispo);
     }
 }
 
 // Função auxiliar para verificar se uma posição está dentro do tabuleiro
-int dentro_do_tabuleiro(int linha, int coluna)
+int estaDentroDoTabuleiro(int linha, int coluna)
 {
     return (linha >= 0 && linha < 8 && coluna >= 0 && coluna < 8);
 };
 
 // Verifica se a próxima casa na direção especificada é a última da direção
-int eh_ultima_casa_na_direcao(int linha, int coluna, int deslocamento_linha, int deslocamento_coluna)
+int ehUltimaCasaNaDirecao(int linha, int coluna, int deslocamento_linha, int deslocamento_coluna)
 {
     int proxima_linha = linha + deslocamento_linha;
     int proxima_coluna = coluna + deslocamento_coluna;
 
-    return !dentro_do_tabuleiro(proxima_linha, proxima_coluna);
+    return !estaDentroDoTabuleiro(proxima_linha, proxima_coluna);
 }
 
 // Marca os ataques direcionais para bispo e torre
-void marcar_ataque_direcional(u64 *ataque, int linha, int coluna, int deslocamentos[][2])
+void marcarAtaquesDirecionais(u64 *ataque, int linha, int coluna, int deslocamentos[][2])
 {
     for (int i = 0; i < 4; i++)
     {
@@ -163,13 +163,13 @@ void marcar_ataque_direcional(u64 *ataque, int linha, int coluna, int deslocamen
             int proxima_linha = nova_linha + deslocamentos[i][0];
             int proxima_coluna = nova_coluna + deslocamentos[i][1];
 
-            if (!dentro_do_tabuleiro(proxima_linha, proxima_coluna))
+            if (!estaDentroDoTabuleiro(proxima_linha, proxima_coluna))
             {
                 break;
             }
 
             // Verifica se a próxima casa já é a última da direção
-            if (eh_ultima_casa_na_direcao(proxima_linha, proxima_coluna, deslocamentos[i][0], deslocamentos[i][1]))
+            if (ehUltimaCasaNaDirecao(proxima_linha, proxima_coluna, deslocamentos[i][0], deslocamentos[i][1]))
             {
                 break;
             }
@@ -183,7 +183,7 @@ void marcar_ataque_direcional(u64 *ataque, int linha, int coluna, int deslocamen
     }
 }
 
-void marcar_ataque_direcional_tempo_real(u64 *ataque, int linha, int coluna, int deslocamentos[][2], int num_direcoes, u64 bitboard_ocupacao)
+void marcarAtaquesDirecionaisComBloqueio(u64 *ataque, int linha, int coluna, int deslocamentos[][2], int num_direcoes, u64 bitboard_ocupacao)
 {
     for (int i = 0; i < num_direcoes; i++)
     {
@@ -195,12 +195,15 @@ void marcar_ataque_direcional_tempo_real(u64 *ataque, int linha, int coluna, int
             int proxima_linha = nova_linha + deslocamentos[i][0];
             int proxima_coluna = nova_coluna + deslocamentos[i][1];
 
-            if (!dentro_do_tabuleiro(proxima_linha, proxima_coluna))
+            if (!estaDentroDoTabuleiro(proxima_linha, proxima_coluna))
             {
                 break;
             }
 
             int nova_casa = proxima_linha * 8 + proxima_coluna;
+
+            setBit(*ataque, nova_casa);
+
 
             if (getBit(bitboard_ocupacao, nova_casa))
             {
@@ -208,36 +211,94 @@ void marcar_ataque_direcional_tempo_real(u64 *ataque, int linha, int coluna, int
                 break;
             }
 
-            setBit(*ataque, nova_casa);
             nova_linha = proxima_linha;
             nova_coluna = proxima_coluna;
         }
     }
 }
 
-// Gera os ataques pré-definidos para as peças
-void init_ataques_pecas()
+// Gera os ataques pré-definidos para as peças 
+void inicializarAtaquesPecas()
 {
     for (int casa = 0; casa < 64; casa++)
     {
         // peões
-        tabela_ataques_peao[branco][casa] = gerar_ataque_peao(branco, casa);
-        tabela_ataques_peao[preto][casa] = gerar_ataque_peao(preto, casa);
+        tabela_ataques_peao[branco][casa] = gerarAtaquesPeao(branco, casa);
+        tabela_ataques_peao[preto][casa] = gerarAtaquesPeao(preto, casa);
 
         // cavalo
-        tabela_ataques_cavalo[casa] = gerar_ataque_cavalo(casa);
+        tabela_ataques_cavalo[casa] = gerarAtaquesCavalo(casa);
 
         // rei
-        tabela_ataques_rei[casa] = gerar_ataque_rei(casa);
+        tabela_ataques_rei[casa] = gerarAtaquesRei(casa);
 
         // bispo e torre
-        tabela_ataques_bispo[casa] = gerar_ataque_bispo(casa);
-        tabela_ataques_torre[casa] = gerar_ataque_torre(casa);
+        inicializarAtaquesPecasDeslizantes(bispo);
+        inicializarAtaquesPecasDeslizantes(torre);
     }
 }
 
+void inicializarAtaquesPecasDeslizantes(int peca)
+{
+    for (int casa = 0; casa < 64; casa++)
+    {
+
+        mask_tabela_ataques_bispo[casa] = gerarAtaquesBispo(casa);
+        mask_tabela_ataques_torre[casa] = gerarAtaquesTorre(casa);
+
+        u64 ataque_mask;
+
+        ataque_mask = (peca == bispo) ? mask_tabela_ataques_bispo[casa] : mask_tabela_ataques_torre[casa];
+
+        int bits_relevantes = contarBits(ataque_mask);
+
+        int indices_ocupacao = 1 << bits_relevantes;
+
+        for (int i = 0; i < indices_ocupacao; i++)
+        {
+
+            if (peca == bispo)
+            {
+                u64 ocupacao = set_occupancy(i, bits_relevantes, ataque_mask);
+
+                int indice_magico = (ocupacao * magics_bispo[casa]) >> (64 - bits_relevantes);
+
+                tabela_ataques_bispo[casa][indice_magico] = gerarAtaquesBispoComBloqueio(casa, ocupacao);
+            }
+            else if (peca == torre)
+            {
+                u64 ocupacao = set_occupancy(i, bits_relevantes, ataque_mask);
+
+                int indice_magico = (ocupacao * magics_torre[casa]) >> (64 - bits_relevantes);
+
+                tabela_ataques_torre[casa][indice_magico] = gerarAtaquesTorreComBloqueio(casa, ocupacao);
+            }
+        }
+    }
+}
+
+u64 obterAtaquesBispo(int casa, u64 ocupacao)
+{
+
+    ocupacao &= mask_tabela_ataques_bispo[casa];
+    ocupacao *= magics_bispo[casa];
+    ocupacao >>= (64 - bits_relevantes_bispo[casa]);
+
+    return tabela_ataques_bispo[casa][ocupacao]; // Retorna o ataque correspondente ao índice calculado
+}
+
+u64 obterAtaquesTorre(int casa, u64 ocupacao)
+{
+
+    ocupacao &= mask_tabela_ataques_torre[casa];
+    ocupacao *= magics_torre[casa];
+    ocupacao >>= (64 - bits_relevantes_torre[casa]);
+
+    return tabela_ataques_torre[casa][ocupacao]; // Retorna o ataque correspondente ao índice calculado
+}
+
 // Gera o bitboard de ataques possíveis de um peão a partir da casa fornecida
-u64 gerar_ataque_peao(int lado, int casa)
+u64 gerarAtaquesPeao(int lado, int casa)
 {
 
     u64 ataque = 0ULL;
@@ -278,7 +339,7 @@ u64 gerar_ataque_peao(int lado, int casa)
 }
 
 // Gera o bitboard de ataques possíveis de um cavalo a partir da casa fornecida
-u64 gerar_ataque_cavalo(int casa)
+u64 gerarAtaquesCavalo(int casa)
 {
 
     u64 ataque = 0ULL;
@@ -299,7 +360,7 @@ u64 gerar_ataque_cavalo(int casa)
         int nova_linha = linha + deslocamentos[i][0];
         int nova_coluna = coluna + deslocamentos[i][1];
 
-        if (dentro_do_tabuleiro(nova_linha, nova_coluna))
+        if (estaDentroDoTabuleiro(nova_linha, nova_coluna))
         {
             int nova_casa = nova_linha * 8 + nova_coluna;
             setBit(ataque, nova_casa); // Marca a casa como atacada
@@ -310,7 +371,7 @@ u64 gerar_ataque_cavalo(int casa)
 }
 
 // Gera o bitboard de ataques possíveis de um rei a partir da casa fornecida
-u64 gerar_ataque_rei(int casa)
+u64 gerarAtaquesRei(int casa)
 {
 
     u64 ataque = 0ULL;
@@ -331,7 +392,7 @@ u64 gerar_ataque_rei(int casa)
         int nova_linha = linha + deslocamentos[i][0];
         int nova_coluna = coluna + deslocamentos[i][1];
 
-        if (dentro_do_tabuleiro(nova_linha, nova_coluna))
+        if (estaDentroDoTabuleiro(nova_linha, nova_coluna))
         {
             int nova_casa = nova_linha * 8 + nova_coluna;
             setBit(ataque, nova_casa); // Marca a casa como atacada
@@ -342,7 +403,7 @@ u64 gerar_ataque_rei(int casa)
 }
 
 // Gera o bitboard de ataques possíveis de um bispo a partir da casa fornecida
-u64 gerar_ataque_bispo(int casa)
+u64 gerarAtaquesBispo(int casa)
 {
 
     u64 ataque = 0ULL;
@@ -354,13 +415,13 @@ u64 gerar_ataque_bispo(int casa)
     int deslocamentos[4][2] = {
         {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
-    marcar_ataque_direcional(&ataque, linha, coluna, deslocamentos);
+    marcarAtaquesDirecionais(&ataque, linha, coluna, deslocamentos);
 
     return ataque;
 }
 
 // Gera o bitboard de ataques possíveis de uma torre a partir da casa fornecida
-u64 gerar_ataque_torre(int casa)
+u64 gerarAtaquesTorre(int casa)
 {
 
     u64 ataque = 0ULL;
@@ -372,12 +433,12 @@ u64 gerar_ataque_torre(int casa)
     int deslocamentos[4][2] = {
         {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-    marcar_ataque_direcional(&ataque, linha, coluna, deslocamentos);
+    marcarAtaquesDirecionais(&ataque, linha, coluna, deslocamentos);
 
     return ataque;
 }
-// Gera o bitboard de ataques possíveis de uma torre considerando peças que bloqueiam
-u64 gerar_ataque_bispo_tempo_real(int casa, u64 bitboard_ocupacao)
+// Gera o bitboard de ataques possíveis de um bispo considerando peças que bloqueiam
+u64 gerarAtaquesBispoComBloqueio(int casa, u64 bitboard_ocupacao)
 {
     u64 ataque = 0ULL;
     int linha = casa / 8;
@@ -386,12 +447,12 @@ u64 gerar_ataque_bispo_tempo_real(int casa, u64 bitboard_ocupacao)
     int deslocamentos[4][2] = {
         {1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
 
-    marcar_ataque_direcional_tempo_real(&ataque, linha, coluna, deslocamentos, 4, bitboard_ocupacao);
+    marcarAtaquesDirecionaisComBloqueio(&ataque, linha, coluna, deslocamentos, 4, bitboard_ocupacao);
     return ataque;
 }
 
-// Gera o bitboard de ataques possíveis de um bispo considerando peças que bloqueiam
-u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard_ocupacao)
+// Gera o bitboard de ataques possíveis de uma torre considerando peças que bloqueiam
+u64 gerarAtaquesTorreComBloqueio(int casa, u64 bitboard_ocupacao)
 {
     u64 ataque = 0ULL;
     int linha = casa / 8;
@@ -400,7 +461,7 @@ u64 gerar_ataque_torre_tempo_real(int casa, u64 bitboard_ocupacao)
     int deslocamentos[4][2] = {
         {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-    marcar_ataque_direcional_tempo_real(&ataque, linha, coluna, deslocamentos, 4, bitboard_ocupacao);
+    marcarAtaquesDirecionaisComBloqueio(&ataque, linha, coluna, deslocamentos, 4, bitboard_ocupacao);
     return ataque;
 }
 

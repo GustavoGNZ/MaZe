@@ -3,8 +3,13 @@
 u64 tabela_ataques_peao[2][64];
 u64 tabela_ataques_cavalo[64];
 u64 tabela_ataques_rei[64];
-u64 tabela_ataques_bispo[64];
-u64 tabela_ataques_torre[64];
+
+u64 mask_tabela_ataques_bispo[64];
+u64 mask_tabela_ataques_torre[64];
+
+u64 tabela_ataques_bispo[64][512];
+u64 tabela_ataques_torre[64][4096];
+
 
 // gerado usando um for que percorre todas as casas do tabuleiro e conta os bits de cada retorno da funcao gerar_ataque_bispo e gerar_ataque_torre
 const int bits_relevantes_bispo[64] = {
@@ -162,4 +167,5 @@ u64 magics_torre[64] = {
     0x2006104900a0804ULL,
     0x1004081002402ULL,
 };
+
 
