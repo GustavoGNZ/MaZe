@@ -1,5 +1,30 @@
 #include "../include/bitboard.h"
 
+u64 bitboards[12];
+
+
+u64 ocupacoes[3];
+
+int lado_a_jogar = -999; 
+int en_passant = -999;
+int roque = -999; 
+
+const char pecas_ascii[] = {
+    'P', 'N', 'B', 'R', 'Q', 'K', // Peças brancas
+    'p', 'n', 'b', 'r', 'q', 'k'  // Peças pretas
+};
+
+const char *pecas_unicode[] = {
+    "♟", "♞", "♝", "♜", "♛", "♚", // Peças brancas
+    "♙", "♘", "♗", "♖", "♕", "♔"  // Peças pretas
+};
+
+int pecas_char[] = {
+    [P] = 'P', [N] = 'N', [B] = 'B', [R] = 'R', [Q] = 'Q', [K] = 'K',
+    [p] = 'p', [n] = 'n', [b] = 'b', [r] = 'r', [q] = 'q', [k] = 'k'
+};
+
+
 const char *casa_nome[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -50,3 +75,4 @@ int contarBits(u64 bitboard)
 
     return count;
 }
+

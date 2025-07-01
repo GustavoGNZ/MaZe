@@ -7,6 +7,8 @@
 int main()
 {
     u64 tabuleiro = 0ULL;    
+
+
     
     return 0;
 }

@@ -12,7 +12,20 @@
 
 extern const char *casa_nome[]; // Mapeamento de casas do tabuleiro
 
-// Função de utilitário
+
+// bitboards para peças
+extern u64 bitboards[12]; // bitboards para cada tipo de peça 
+extern u64 ocupacoes[3]; // Ocupações do tabuleiro (brancas, pretas e ambos)
+
+extern int lado_a_jogar;
+extern int en_passant;
+extern int roque;
+
+extern const char pecas_ascii[]; // Representação ASCII das peças
+extern const char *pecas_unicode[]; // Representação Unicode das peças
+extern int pecas_char[]; // Mapeamento de peças para caracteres
+
+// Função utilitária
 void printBitboard(u64 bitboard);
 int contarBits(u64 bitboard);
 
@@ -26,7 +39,29 @@ enum { a1, b1, c1, d1, e1, f1, g1, h1,
        a7, b7, c7, d7, e7, f7, g7, h7,
        a8, b8, c8, d8, e8, f8, g8, h8 };
 
-enum { branco, preto };
-enum { peao, cavalo, bispo, torre, dama, rei };
+enum { branco, preto, ambos }; // lados
+enum { peao, cavalo, bispo, torre, dama, rei }; // lidar com pecas em alto nivel (nao sao as pecas do bitboard)
+
+/* Enumerações para roques
+
+    0001 = rei branco ala rei
+    0010 = rei branco ala dama
+    0100 = rei preto ala rei
+    1000 = rei preto ala dama
+
+    0011 = rei branco ala rei e dama
+    1100 = rei preto ala rei e dama
+    1111 = ambos os lados com roque
+    0000 = nenhum roque
+
+*/ 
+
+enum { reiBranco_alaRei = 1, reiBranco_alaDama = 2,
+       reiPreto_alaRei = 4, reiPreto_alaDama = 8}; // roques
+
+enum { P, N, B, R, Q, K, p, n, b, r, q, k }; // peças no bitboard (maiúsculas para brancas e minúsculas para pretas)
+// usando notacao em ingles por exemplo: P = Pawn, N = Knight, B = Bishop, R = Rook, Q = Queen, K = King
+
+
 
 #endif
