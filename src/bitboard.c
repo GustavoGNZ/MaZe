@@ -1,4 +1,5 @@
 #include "../include/bitboard.h"
+#include <string.h>
 
 u64 bitboards[12];
 u64 ocupacoes[3];
@@ -111,60 +112,105 @@ void printTabuleiro()
     printf("\n");
 }
 
-void gerarPosicaoInicial()
-{
-    // Limpa os bitboards
-    for (int i = 0; i < 12; i++)
-    {
-        bitboards[i] = 0ULL;
-    }
-
-    // Coloca as peças brancas
-    setBit(bitboards[R], a1);
-    setBit(bitboards[N], b1);
-    setBit(bitboards[B], c1);
-    setBit(bitboards[Q], d1);
-    setBit(bitboards[K], e1);
-    setBit(bitboards[B], f1);
-    setBit(bitboards[N], g1);
-    setBit(bitboards[R], h1);
-
-    for (int i = a2; i <= h2; i++)
-    {
-        setBit(bitboards[P], i);
-    }
-
-    // Coloca as peças pretas
-    setBit(bitboards[r], a8);
-    setBit(bitboards[n], b8);
-    setBit(bitboards[b], c8);
-    setBit(bitboards[q], d8);
-    setBit(bitboards[k], e8);
-    setBit(bitboards[b], f8);
-    setBit(bitboards[n], g8);
-    setBit(bitboards[r], h8);
-
-    for (int i = a7; i <= h7; i++)
-    {
-        setBit(bitboards[p], i);
-    }
-
-    // Inicializa ocupações
-    ocupacoes[branco] = 0ULL;
-    ocupacoes[preto] = 0ULL;
-    
-    for (int i = P; i <= K; i++)
-        ocupacoes[branco] |= bitboards[i];
-
-    for (int i = p; i <= k; i++)
-        ocupacoes[preto] |= bitboards[i];
-
-    ocupacoes[ambos] = ocupacoes[branco] | ocupacoes[preto];
-
-    // Inicializa o lado a jogar
+// Analisador sintático de FEN (Forsyth-Edwards Notation).
+// Esta função deve ser implementada para interpretar a notação FEN e configurar o tabuleiro 
+void parseFEN(char *fen){
+    // Inicializa os bitboards e ocupações vazios e variaveis de estado do jogo
+    memset(bitboards, 0ULL, sizeof(bitboards));
+    memset(ocupacoes, 0ULL, sizeof(ocupacoes));
     lado_a_jogar = branco;
-    en_passant = -999; // Nenhum en passant disponível
+    en_passant = -999;
     roque = 0;
+
+    // Cria mapeamento reverso usando seu pecas_char[] existente
+    int char_para_peca[256];
+    memset(char_para_peca, -1, sizeof(char_para_peca));
+    
+    // Usa seu array existente para criar o mapeamento reverso
+    for(int i = P; i <= k; i++) {
+        char_para_peca[pecas_char[i]] = i;
+    }
+
+    // 1. Parse das peças (FEN começa da linha 8 e vai até linha 1)
+    for(int linha = 7; linha >= 0; linha--) {
+        for(int coluna = 0; coluna < 8; coluna++) {
+            int casa = linha * 8 + coluna;
+            
+            if(*fen == '/') {
+                fen++; // Pula o separador de linha
+                coluna--; // Compensa o incremento do loop
+                continue;
+            }
+            
+            if(*fen >= '1' && *fen <= '8') {
+                // Número representa casas vazias
+                int casas_vazias = *fen - '0';
+                coluna += casas_vazias - 1; // -1 porque o loop já incrementa
+                fen++;
+            }
+            else if(char_para_peca[*fen] != -1) {
+                // É uma peça válida
+                int peca = char_para_peca[*fen];
+                setBit(bitboards[peca], casa);
+                fen++;
+            }
+            else {
+                fen++; // Pula caracteres não reconhecidos
+            }
+        }
+    }
+    
+    // Pula espaço após as peças
+    if(*fen == ' ') fen++;
+    
+    // 2. Parse do lado a jogar
+    if(*fen == 'w') {
+        lado_a_jogar = branco;
+    } else if(*fen == 'b') {
+        lado_a_jogar = preto;
+    }
+    fen++;
+    
+    // Pula espaço
+    if(*fen == ' ') fen++;
+    
+    // 3. Parse do roque
+    if(*fen != '-') {
+        while(*fen != ' ' && *fen != '\0') {
+            if(*fen == 'K') roque |= reiBranco_alaRei;
+            else if(*fen == 'Q') roque |= reiBranco_alaDama;
+            else if(*fen == 'k') roque |= reiPreto_alaRei;
+            else if(*fen == 'q') roque |= reiPreto_alaDama;
+            fen++;
+        }
+    } else {
+        fen++; // Pula o '-'
+    }
+    
+    // Pula espaço
+    if(*fen == ' ') fen++;
+    
+    // 4. Parse do en passant
+    if(*fen != '-') {
+        // Converte notação algébrica (ex: "e3") para índice de casa
+        int coluna = *fen - 'a';  // 'a' = 0, 'b' = 1, etc.
+        fen++;
+        int linha = *fen - '1';   // '1' = 0, '2' = 1, etc.
+        fen++;
+        en_passant = linha * 8 + coluna;
+    } else {
+        en_passant = -999;
+        fen++; // Pula o '-'
+    }
+    
+    // Atualizar ocupações
+    for(int i = P; i <= K; i++) {
+        ocupacoes[branco] |= bitboards[i];
+    }
+    for(int i = p; i <= k; i++) {
+        ocupacoes[preto] |= bitboards[i];
+    }
+    ocupacoes[ambos] = ocupacoes[branco] | ocupacoes[preto];
 }
 
 int contarBits(u64 bitboard)
