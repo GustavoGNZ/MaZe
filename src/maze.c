@@ -6,8 +6,9 @@
 
 int main()
 {
-    u64 tabuleiro = 0ULL;    
-
+    u64 tabuleiro = 0ULL;
+    gerarPosicaoInicial();
+    printTabuleiro();
 
     
     return 0;
