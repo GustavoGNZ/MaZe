@@ -41,6 +41,7 @@ u64 obterAtaquesDama(int casa, u64 ocupacao);
 u64 set_occupancy(int index, int qtde_bits, u64 mask);
 
 int casaEstaAtacada(int casa, int lado);
+void gerar_lances();
 
 
 #endif

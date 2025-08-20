@@ -16,6 +16,9 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
+    parseFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPpP/R3K2R b KQkq - 0 1");
+    printTabuleiro();
+    gerar_lances();
 
     return 0;
 }
