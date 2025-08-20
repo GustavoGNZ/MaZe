@@ -14,13 +14,6 @@ int main()
 {
     u64 tabuleiro = 0ULL;
 
-    parseFEN(posicaoInicial);
-    printTabuleiro();
-    parseFEN(posicaoGN);
-    printTabuleiro();
-    printBitboard(ocupacoes[ambos]);
-
-    
     return 0;
 }
                                                                                                                         

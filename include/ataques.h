@@ -35,6 +35,7 @@ u64 gerarAtaquesTorreComBloqueio(int casa, u64 bitboard_ocupacao);
 
 u64 obterAtaquesBispo(int casa, u64 ocupacao);
 u64 obterAtaquesTorre(int casa, u64 ocupacao);
+u64 obterAtaquesDama(int casa, u64 ocupacao); 
 
 u64 set_occupancy(int index, int qtde_bits, u64 mask);
 

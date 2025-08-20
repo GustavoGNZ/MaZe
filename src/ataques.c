@@ -297,6 +297,10 @@ u64 obterAtaquesTorre(int casa, u64 ocupacao)
     return tabela_ataques_torre[casa][ocupacao]; // Retorna o ataque correspondente ao índice calculado
 }
 
+u64 obterAtaquesDama(int casa, u64 ocupacao){
+    return (obterAtaquesBispo(casa, ocupacao) | obterAtaquesTorre(casa, ocupacao)); // A dama ataca como bispo e torre
+}
+
 // Gera o bitboard de ataques possíveis de um peão a partir da casa fornecida
 u64 gerarAtaquesPeao(int lado, int casa)
 {
@@ -437,6 +441,7 @@ u64 gerarAtaquesTorre(int casa)
 
     return ataque;
 }
+
 // Gera o bitboard de ataques possíveis de um bispo considerando peças que bloqueiam
 u64 gerarAtaquesBispoComBloqueio(int casa, u64 bitboard_ocupacao)
 {
