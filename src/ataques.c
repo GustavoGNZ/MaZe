@@ -235,6 +235,7 @@ void inicializarAtaquesPecas()
         // bispo e torre
         inicializarAtaquesPecasDeslizantes(bispo);
         inicializarAtaquesPecasDeslizantes(torre);
+
     }
 }
 
@@ -485,4 +486,32 @@ u64 set_occupancy(int index, int qtde_bits, u64 mask)
         }
     }
     return occupancy;
+}
+
+void runEngine(){
+    // adicionar funcoes futuras que precisam ser inicializadas
+
+    inicializarAtaquesPecas();
+    // inicializarMagicNumbers(); ja estao gerados
+
+}
+
+int casaEstaAtacada(int casa, int lado) {
+
+    if ((lado == branco) && (tabela_ataques_peao[preto][casa] & bitboards[P])) return 1;
+    
+    if ((lado == preto) && (tabela_ataques_peao[branco][casa] & bitboards[p])) return 1;
+    
+    if (tabela_ataques_cavalo[casa] & ((lado == branco) ? bitboards[N] : bitboards[n])) return 1;
+    
+    if (obterAtaquesBispo(casa, ocupacoes[ambos]) & ((lado == branco) ? bitboards[B] : bitboards[b])) return 1;
+
+    if (obterAtaquesTorre(casa, ocupacoes[ambos]) & ((lado == branco) ? bitboards[R] : bitboards[r])) return 1;    
+
+    if (obterAtaquesDama(casa, ocupacoes[ambos]) & ((lado == branco) ? bitboards[Q] : bitboards[q])) return 1;
+    
+    
+    if (tabela_ataques_rei[casa] & ((lado == branco) ? bitboards[K] : bitboards[k])) return 1;
+
+    return 0;
 }

@@ -4,6 +4,7 @@
 #include "bitboard.h"
 
 // Funcoes de geração de números aleatórios
+void runEngine();
 unsigned int gerarNumeroAleatorio32bits();
 u64 gerarNumeroAleatorio64bits();
 void inicializarMagicNumbers();
@@ -38,6 +39,8 @@ u64 obterAtaquesTorre(int casa, u64 ocupacao);
 u64 obterAtaquesDama(int casa, u64 ocupacao); 
 
 u64 set_occupancy(int index, int qtde_bits, u64 mask);
+
+int casaEstaAtacada(int casa, int lado);
 
 
 #endif

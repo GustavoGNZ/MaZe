@@ -1,4 +1,5 @@
 #include "../include/bitboard.h"
+#include "../include/ataques.h"
 #include <string.h>
 
 u64 bitboards[12];
@@ -110,6 +111,34 @@ void printTabuleiro()
     printf("%c", (roque & reiPreto_alaRei)      ? 'k' : '-');
     printf("%c", (roque & reiPreto_alaDama)     ? 'q' : '-');
     printf("\n");
+}
+
+void printCasasAtacadasPeloLado(int lado){
+    printf("\n");
+    
+    // loop sobre as linhas do tabuleiro (de 7 para 0, igual ao printTabuleiro)
+    for (int linha = 7; linha >= 0; linha--)
+    {
+        // loop sobre as colunas do tabuleiro
+        for (int coluna = 0; coluna < 8; coluna++)
+        {
+            // inicializa casa
+            int casa = linha * 8 + coluna;
+            
+            // imprime números das linhas
+            if (!coluna)
+                printf("  %d ", linha + 1); // linha + 1 para mostrar 8, 7, 6...
+            
+            // verifica se a casa atual está atacada ou não
+            printf(" %d", casaEstaAtacada(casa, lado) ? 1 : 0);
+        }
+        
+        // imprime nova linha a cada linha
+        printf("\n");
+    }
+    
+    // imprime colunas
+    printf("\n     a b c d e f g h\n\n");
 }
 
 // Analisador sintático de FEN (Forsyth-Edwards Notation).

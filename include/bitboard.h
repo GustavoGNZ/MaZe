@@ -28,6 +28,7 @@ extern int pecas_char[]; // Mapeamento de peças para caracteres
 // Função utilitária
 void printBitboard(u64 bitboard); // Imprime o bitboard que representa o tabuleiro de xadrez
 void printTabuleiro();            // Imprime o tabuleiro a partir do bitboard
+void printCasasAtacadasPeloLado(int lado);
 void parseFEN(char *fen); // Analisador sintático de FEN (Forsyth-Edwards Notation)
 int contarBits(u64 bitboard); // Conta o número de bits setados no bitboard
 
