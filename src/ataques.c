@@ -1,5 +1,7 @@
 #include "../include/ataques.h"
 #include "../include/globals.h"
+#include "../include/bitboard.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -568,6 +570,43 @@ void gerar_lances()
                             }
                         }
                     }
+                    ataques = tabela_ataques_peao[branco][origem] & ocupacoes[preto];
+
+                    if (ataques)
+                    {
+                        while (ataques)
+                        {
+                            destino = getLeastBitIndex(ataques);
+                            
+                            if (origem >= a7 && origem <= h7) // 7ª linha (promoção)
+                            {
+                                printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+                            }
+                            else
+                            {
+                                printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
+                            }
+                            
+                            clearBit(ataques, destino);
+                        }                    }
+
+                    // Verificar en passant para peões brancos
+                    if (en_passant != -999)
+                    {
+                        // Verificar se o peão está na 5ª linha (origem >= a5 && origem <= h5)
+                        if (origem >= a5 && origem <= h5)
+                        {
+                            // Verificar se o peão pode capturar en passant (adjacente à casa en passant)
+                            if ((origem % 8 != 0 && en_passant == origem + 7) || // Captura à esquerda
+                                (origem % 8 != 7 && en_passant == origem + 9))   // Captura à direita
+                            {
+                                printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
+                            }
+                        }
+                    }
 
                     clearBit(bitboardCopia, origem);
                 }
@@ -605,6 +644,45 @@ void gerar_lances()
                                 {
                                     printf("Peao avança duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
                                 }
+                            }
+                        }
+                    }
+
+                    ataques = tabela_ataques_peao[preto][origem] & ocupacoes[branco];
+
+                    if (ataques)
+                    {
+                        while (ataques)
+                        {
+                            destino = getLeastBitIndex(ataques);
+                            
+                            if (origem >= a2 && origem <= h2) // 2ª linha (promoção para peões pretos)
+                            {
+                                printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
+                                printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+                            }
+                            else
+                            {
+                                printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
+                            }
+                            
+                            clearBit(ataques, destino);
+                        }
+                    }
+
+                    // Verificar en passant para peões pretos
+                    if (en_passant != -999)
+                    {
+                        // Verificar se o peão está na 4ª linha (origem >= a4 && origem <= h4)
+                        if (origem >= a4 && origem <= h4)
+                        {
+                            // Verificar se o peão pode capturar en passant (adjacente à casa en passant)
+                            if ((origem % 8 != 0 && en_passant == origem - 9) || // Captura à esquerda
+                                (origem % 8 != 7 && en_passant == origem - 7))   // Captura à direita
+                            {
+                                printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
                             }
                         }
                     }
