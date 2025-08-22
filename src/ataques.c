@@ -611,8 +611,29 @@ void gerar_lances()
                     clearBit(bitboardCopia, origem);
                 }
             }
+           // roque
+           if (peca == K){
+            // roque pequeno 
+            if (roque == reiBranco_alaRei)
+            {
+                if (!getBit(ocupacoes[ambos], f1) && !getBit(ocupacoes[ambos], g1))
+                {
+                    if(!casaEstaAtacada(e1, preto) && !casaEstaAtacada(f1, preto) && !casaEstaAtacada(g1, preto))
+                        printf("Roque pequeno %s%s\n", casa_nome[e1], casa_nome[g1]);
+                }
+            }
+           // roque grande
+           if (roque == reiBranco_alaDama)
+           {
+               if (!getBit(ocupacoes[ambos], b1) && !getBit(ocupacoes[ambos], c1) && !getBit(ocupacoes[ambos], d1))
+               {
+                   if(!casaEstaAtacada(e1, preto) && !casaEstaAtacada(d1, preto) && !casaEstaAtacada(c1, preto))
+                       printf("Roque grande %s%s\n", casa_nome[e1], casa_nome[g1]);
+                }
+           }
+
         }
-        else
+        else // lado_a_jogar == preto
         {
             if (peca == p)
             {
@@ -691,5 +712,7 @@ void gerar_lances()
                 }
             }
         }
+
+
     }
 }
