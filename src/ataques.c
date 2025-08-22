@@ -525,120 +525,153 @@ int casaEstaAtacada(int casa, int lado)
 }
 
 // Função auxiliar para gerar movimentos de peões brancos
-void gerar_movimentos_peao_branco(int origem) {
+void gerar_movimentos_peao_branco(int origem)
+{
     int destino = origem + 8;
-    
+
     // Movimento simples
-    if (destino < 64 && !getBit(ocupacoes[ambos], destino)) {
-        if (origem >= a7 && origem <= h7) { // 7ª linha (promoção)
+    if (destino < 64 && !getBit(ocupacoes[ambos], destino))
+    {
+        if (origem >= a7 && origem <= h7)
+        { // 7ª linha (promoção)
             printf("Peão promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
-        } else {
-            printf("Peao avança %s%s\n", casa_nome[origem], casa_nome[destino]);
-            
+        }
+        else
+        {
+            printf("Peao move %s%s\n", casa_nome[origem], casa_nome[destino]);
+
             // Movimento duplo do peão (da 2ª linha)
-            if (origem >= a2 && origem <= h2) {
+            if (origem >= a2 && origem <= h2)
+            {
                 destino = origem + 16;
-                if (destino < 64 && !getBit(ocupacoes[ambos], destino)) {
-                    printf("Peao avança duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
+                if (destino < 64 && !getBit(ocupacoes[ambos], destino))
+                {
+                    printf("Peao move duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
                 }
             }
         }
     }
-    
+
     // Capturas
     u64 ataques = tabela_ataques_peao[branco][origem] & ocupacoes[preto];
-    while (ataques) {
+    while (ataques)
+    {
         destino = getLeastBitIndex(ataques);
-        
-        if (origem >= a7 && origem <= h7) { // 7ª linha (promoção)
+
+        if (origem >= a7 && origem <= h7)
+        { // 7ª linha (promoção)
             printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
-        } else {
+        }
+        else
+        {
             printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
         }
-        
+
         clearBit(ataques, destino);
     }
-    
+
     // En passant
-    if (en_passant != -999 && origem >= a5 && origem <= h5) {
-        if ((origem % 8 != 0 && en_passant == origem + 7) || 
-            (origem % 8 != 7 && en_passant == origem + 9)) {
+    if (en_passant != -999 && origem >= a5 && origem <= h5)
+    {
+        if ((origem % 8 != 0 && en_passant == origem + 7) ||
+            (origem % 8 != 7 && en_passant == origem + 9))
+        {
             printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
         }
     }
 }
 
 // Função auxiliar para gerar movimentos de peões pretos
-void gerar_movimentos_peao_preto(int origem) {
+void gerar_movimentos_peao_preto(int origem)
+{
     int destino = origem - 8;
-    
+
     // Movimento simples
-    if (destino >= 0 && !getBit(ocupacoes[ambos], destino)) {
-        if (origem >= a2 && origem <= h2) { // 2ª linha (promoção para peões pretos)
+    if (destino >= 0 && !getBit(ocupacoes[ambos], destino))
+    {
+        if (origem >= a2 && origem <= h2)
+        { // 2ª linha (promoção para peões pretos)
             printf("Peão promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
-        } else {
-            printf("Peao avança %s%s\n", casa_nome[origem], casa_nome[destino]);
-            
+        }
+        else
+        {
+            printf("Peao move %s%s\n", casa_nome[origem], casa_nome[destino]);
+
             // Movimento duplo do peão (da 7ª linha para peões pretos)
-            if (origem >= a7 && origem <= h7) {
+            if (origem >= a7 && origem <= h7)
+            {
                 destino = origem - 16;
-                if (destino >= 0 && !getBit(ocupacoes[ambos], destino)) {
-                    printf("Peao avança duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
+                if (destino >= 0 && !getBit(ocupacoes[ambos], destino))
+                {
+                    printf("Peao move duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
                 }
             }
         }
     }
-    
+
     // Capturas
     u64 ataques = tabela_ataques_peao[preto][origem] & ocupacoes[branco];
-    while (ataques) {
+    while (ataques)
+    {
         destino = getLeastBitIndex(ataques);
-        
-        if (origem >= a2 && origem <= h2) { // 2ª linha (promoção para peões pretos)
+
+        if (origem >= a2 && origem <= h2)
+        { // 2ª linha (promoção para peões pretos)
             printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
             printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
-        } else {
+        }
+        else
+        {
             printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
         }
-        
+
         clearBit(ataques, destino);
     }
-    
+
     // En passant
-    if (en_passant != -999 && origem >= a4 && origem <= h4) {
-        if ((origem % 8 != 0 && en_passant == origem - 9) || 
-            (origem % 8 != 7 && en_passant == origem - 7)) {
+    if (en_passant != -999 && origem >= a4 && origem <= h4)
+    {
+        if ((origem % 8 != 0 && en_passant == origem - 9) ||
+            (origem % 8 != 7 && en_passant == origem - 7))
+        {
             printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
         }
     }
 }
 
 // Função auxiliar para gerar roque branco
-void gerar_roque_branco() {
+void gerar_roque_branco()
+{
     // Roque pequeno
-    if (roque & reiBranco_alaRei) {
-        if (!getBit(ocupacoes[ambos], f1) && !getBit(ocupacoes[ambos], g1)) {
-            if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(f1, preto) && !casaEstaAtacada(g1, preto)) {
+    if (roque & reiBranco_alaRei)
+    {
+        if (!getBit(ocupacoes[ambos], f1) && !getBit(ocupacoes[ambos], g1))
+        {
+            if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(f1, preto) && !casaEstaAtacada(g1, preto))
+            {
                 printf("Roque pequeno %s%s\n", casa_nome[e1], casa_nome[g1]);
             }
         }
     }
-    
+
     // Roque grande
-    if (roque & reiBranco_alaDama) {
-        if (!getBit(ocupacoes[ambos], b1) && !getBit(ocupacoes[ambos], c1) && !getBit(ocupacoes[ambos], d1)) {
-            if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(d1, preto) && !casaEstaAtacada(c1, preto)) {
+    if (roque & reiBranco_alaDama)
+    {
+        if (!getBit(ocupacoes[ambos], b1) && !getBit(ocupacoes[ambos], c1) && !getBit(ocupacoes[ambos], d1))
+        {
+            if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(d1, preto) && !casaEstaAtacada(c1, preto))
+            {
                 printf("Roque grande %s%s\n", casa_nome[e1], casa_nome[c1]);
             }
         }
@@ -646,53 +679,147 @@ void gerar_roque_branco() {
 }
 
 // Função auxiliar para gerar roque preto
-void gerar_roque_preto() {
+void gerar_roque_preto()
+{
     // Roque pequeno
-    if (roque & reiPreto_alaRei) {
-        if (!getBit(ocupacoes[ambos], f8) && !getBit(ocupacoes[ambos], g8)) {
-            if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(f8, branco) && !casaEstaAtacada(g8, branco)) {
+    if (roque & reiPreto_alaRei)
+    {
+        if (!getBit(ocupacoes[ambos], f8) && !getBit(ocupacoes[ambos], g8))
+        {
+            if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(f8, branco) && !casaEstaAtacada(g8, branco))
+            {
                 printf("Roque pequeno %s%s\n", casa_nome[e8], casa_nome[g8]);
             }
         }
     }
-    
+
     // Roque grande
-    if (roque & reiPreto_alaDama) {
-        if (!getBit(ocupacoes[ambos], b8) && !getBit(ocupacoes[ambos], c8) && !getBit(ocupacoes[ambos], d8)) {
-            if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(d8, branco) && !casaEstaAtacada(c8, branco)) {
+    if (roque & reiPreto_alaDama)
+    {
+        if (!getBit(ocupacoes[ambos], b8) && !getBit(ocupacoes[ambos], c8) && !getBit(ocupacoes[ambos], d8))
+        {
+            if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(d8, branco) && !casaEstaAtacada(c8, branco))
+            {
                 printf("Roque grande %s%s\n", casa_nome[e8], casa_nome[c8]);
             }
         }
     }
 }
 
-void gerar_lances() {
-    for (int peca = P; peca <= k; peca++) {
-        if (!bitboards[peca]) continue; // Pula se não há peças deste tipo
-        
-        if (lado_a_jogar == branco) {
-            if (peca == P) {
+// Função genérica para gerar movimentos de peças "grandes" (cavalos, bispos, torres, damas)
+void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca)
+{
+    u64 ataques;
+    const char* nome_peca;
+    
+    // Obtém os ataques baseado no tipo da peça
+    switch (tipo_peca) {
+        case N:
+        case n:
+            ataques = tabela_ataques_cavalo[origem];
+            nome_peca = "Cavalo";
+            break;
+        case B:
+        case b:
+            ataques = obterAtaquesBispo(origem, ocupacoes[ambos]);
+            nome_peca = "Bispo";
+            break;
+        case R:
+        case r:
+            ataques = obterAtaquesTorre(origem, ocupacoes[ambos]);
+            nome_peca = "Torre";
+            break;
+        case Q:
+        case q:
+            ataques = obterAtaquesDama(origem, ocupacoes[ambos]);
+            nome_peca = "Dama";
+            break;
+        default:
+            return; // Tipo de peça inválido
+    }
+    
+    // Remove casas ocupadas pelo próprio lado
+    ataques &= ~ocupacoes[lado];
+    u64 ocupacao_oponente = (lado == branco) ? ocupacoes[preto] : ocupacoes[branco];
+
+    while (ataques)
+    {
+        int destino = getLeastBitIndex(ataques);
+
+        if (getBit(ocupacao_oponente, destino))
+        {
+            printf("%s captura %s%s\n", nome_peca, casa_nome[origem], casa_nome[destino]);
+        }
+        else
+        {
+            printf("%s move %s%s\n", nome_peca, casa_nome[origem], casa_nome[destino]);
+        }
+
+        clearBit(ataques, destino);
+    }
+}
+
+void gerar_lances()
+{
+    for (int peca = P; peca <= k; peca++)
+    {
+        if (!bitboards[peca])
+            continue; // Pula se não há peças deste tipo
+
+        if (lado_a_jogar == branco)
+        {
+            if (peca == P)
+            {
                 u64 bitboardCopia = bitboards[peca];
-                while (bitboardCopia) {
+                while (bitboardCopia)
+                {
                     int origem = getLeastBitIndex(bitboardCopia);
                     gerar_movimentos_peao_branco(origem);
                     clearBit(bitboardCopia, origem);
                 }
-            } else if (peca == K) {
+            }
+            else if (peca == K)
+            {
                 gerar_roque_branco();
                 // TODO: Adicionar movimentos normais do rei depois
             }
-        } else { // lado_a_jogar == preto
-            if (peca == p) {
+            else if (peca == N || peca == B || peca == R || peca == Q)
+            {
                 u64 bitboardCopia = bitboards[peca];
-                while (bitboardCopia) {
+                while (bitboardCopia)
+                {
+                    int origem = getLeastBitIndex(bitboardCopia);
+                    gerar_movimentos_pecaGrande(origem, branco, peca);
+                    clearBit(bitboardCopia, origem);
+                }
+            }
+        }
+        else
+        { // lado_a_jogar == preto
+            if (peca == p)
+            {
+                u64 bitboardCopia = bitboards[peca];
+                while (bitboardCopia)
+                {
                     int origem = getLeastBitIndex(bitboardCopia);
                     gerar_movimentos_peao_preto(origem);
                     clearBit(bitboardCopia, origem);
                 }
-            } else if (peca == k) {
+            }
+            else if (peca == k)
+            {
                 gerar_roque_preto();
                 // TODO: Adicionar movimentos normais do rei depois
+            }
+            else if (peca == n || peca == b || peca == r || peca == q)
+            {
+                u64 bitboardCopia = bitboards[peca];
+                while (bitboardCopia)
+                {
+                    int origem = getLeastBitIndex(bitboardCopia);
+                    gerar_movimentos_pecaGrande(origem, preto, peca);
+                    clearBit(bitboardCopia, origem);
+                }
             }
         }
     }

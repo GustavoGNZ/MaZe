@@ -47,7 +47,7 @@ void gerar_movimentos_peao_branco(int origem);
 void gerar_movimentos_peao_preto(int origem);
 void gerar_roque_branco();
 void gerar_roque_preto();
-
+void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca);
 void gerar_lances();
 
 
