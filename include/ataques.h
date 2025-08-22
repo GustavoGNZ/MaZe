@@ -41,6 +41,13 @@ u64 obterAtaquesDama(int casa, u64 ocupacao);
 u64 set_occupancy(int index, int qtde_bits, u64 mask);
 
 int casaEstaAtacada(int casa, int lado);
+
+
+void gerar_movimentos_peao_branco(int origem);
+void gerar_movimentos_peao_preto(int origem);
+void gerar_roque_branco();
+void gerar_roque_preto();
+
 void gerar_lances();
 
 

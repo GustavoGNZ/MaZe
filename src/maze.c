@@ -24,6 +24,7 @@ int main()
     parseFEN(posicaoTeste);
     printTabuleiro();
     gerar_lances();
+    
 
     return 0;
 }
