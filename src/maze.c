@@ -21,7 +21,7 @@ int main()
 
     runEngine();
     // parseFEN("r3k2r/p1ppqpb1/bnp1pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPpP/R3K2R b KQkq - 0 1");
-    parseFEN(enPassantPreto);
+    parseFEN(posicaoTeste);
     printTabuleiro();
     gerar_lances();
 
