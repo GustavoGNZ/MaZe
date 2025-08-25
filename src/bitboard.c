@@ -272,6 +272,11 @@ void printLance(int lance){
 
 void printListaLances(lances *listaLances) {
     
+    if(listaLances->contador == 0){
+        printf("Nao ha lances gerados\n");
+        return;
+    }
+
     printf("\n move piece, capture, double push, en passant, castling\n");
 
     for (int i = 0; i < listaLances->contador; i++) {

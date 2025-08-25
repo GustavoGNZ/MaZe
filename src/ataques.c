@@ -534,14 +534,14 @@ void gerar_movimentos_peao_branco(int origem)
     {
         if (origem >= a7 && origem <= h7)
         { // 7ª linha (promoção)
-            printf("Peão promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sq Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sr Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sb Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sn Peão promove \n", casa_nome[origem], casa_nome[destino]);
         }
         else
         {
-            printf("Peao move %s%s\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%s Peao move\n", casa_nome[origem], casa_nome[destino]);
 
             // Movimento duplo do peão (da 2ª linha)
             if (origem >= a2 && origem <= h2)
@@ -549,7 +549,7 @@ void gerar_movimentos_peao_branco(int origem)
                 destino = origem + 16;
                 if (destino < 64 && !getBit(ocupacoes[ambos], destino))
                 {
-                    printf("Peao move duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
+                    printf("%s%s Peao move duplo\n", casa_nome[origem], casa_nome[destino]);
                 }
             }
         }
@@ -563,14 +563,14 @@ void gerar_movimentos_peao_branco(int origem)
 
         if (origem >= a7 && origem <= h7)
         { // 7ª linha (promoção)
-            printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sq Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sr Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sb Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sn Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
         }
         else
         {
-            printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%s Peão captura\n", casa_nome[origem], casa_nome[destino]);
         }
 
         clearBit(ataques, destino);
@@ -582,7 +582,7 @@ void gerar_movimentos_peao_branco(int origem)
         if ((origem % 8 != 0 && en_passant == origem + 7) ||
             (origem % 8 != 7 && en_passant == origem + 9))
         {
-            printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
+            printf("%s%s Peão captura en passant\n", casa_nome[origem], casa_nome[en_passant]);
         }
     }
 }
@@ -597,14 +597,14 @@ void gerar_movimentos_peao_preto(int origem)
     {
         if (origem >= a2 && origem <= h2)
         { // 2ª linha (promoção para peões pretos)
-            printf("Peão promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sq Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sr Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sb Peão promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sn Peão promove \n", casa_nome[origem], casa_nome[destino]);
         }
         else
         {
-            printf("Peao move %s%s\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%s Peao move\n", casa_nome[origem], casa_nome[destino]);
 
             // Movimento duplo do peão (da 7ª linha para peões pretos)
             if (origem >= a7 && origem <= h7)
@@ -612,7 +612,7 @@ void gerar_movimentos_peao_preto(int origem)
                 destino = origem - 16;
                 if (destino >= 0 && !getBit(ocupacoes[ambos], destino))
                 {
-                    printf("Peao move duplo %s%s\n", casa_nome[origem], casa_nome[destino]);
+                    printf("%s%s Peao move duplo\n", casa_nome[origem], casa_nome[destino]);
                 }
             }
         }
@@ -626,14 +626,14 @@ void gerar_movimentos_peao_preto(int origem)
 
         if (origem >= a2 && origem <= h2)
         { // 2ª linha (promoção para peões pretos)
-            printf("Peão captura e promove %s%sq\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sr\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sb\n", casa_nome[origem], casa_nome[destino]);
-            printf("Peão captura e promove %s%sn\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sq Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sr Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sb Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%sn Peão captura e promove \n", casa_nome[origem], casa_nome[destino]);
         }
         else
         {
-            printf("Peão captura %s%s\n", casa_nome[origem], casa_nome[destino]);
+            printf("%s%s Peão captura\n", casa_nome[origem], casa_nome[destino]);
         }
 
         clearBit(ataques, destino);
@@ -645,7 +645,7 @@ void gerar_movimentos_peao_preto(int origem)
         if ((origem % 8 != 0 && en_passant == origem - 9) ||
             (origem % 8 != 7 && en_passant == origem - 7))
         {
-            printf("Peão captura en passant %s%s\n", casa_nome[origem], casa_nome[en_passant]);
+            printf("%s%s Peão captura en passant\n", casa_nome[origem], casa_nome[en_passant]);
         }
     }
 }
@@ -660,7 +660,7 @@ void gerar_roque_branco()
         {
             if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(f1, preto) && !casaEstaAtacada(g1, preto))
             {
-                printf("Roque pequeno %s%s\n", casa_nome[e1], casa_nome[g1]);
+                printf("%s%s Roque pequeno\n", casa_nome[e1], casa_nome[g1]);
             }
         }
     }
@@ -672,7 +672,7 @@ void gerar_roque_branco()
         {
             if (!casaEstaAtacada(e1, preto) && !casaEstaAtacada(d1, preto) && !casaEstaAtacada(c1, preto))
             {
-                printf("Roque grande %s%s\n", casa_nome[e1], casa_nome[c1]);
+                printf("%s%s Roque grande\n", casa_nome[e1], casa_nome[c1]);
             }
         }
     }
@@ -688,7 +688,7 @@ void gerar_roque_preto()
         {
             if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(f8, branco) && !casaEstaAtacada(g8, branco))
             {
-                printf("Roque pequeno %s%s\n", casa_nome[e8], casa_nome[g8]);
+                printf("%s%s Roque pequeno\n", casa_nome[e8], casa_nome[g8]);
             }
         }
     }
@@ -700,7 +700,7 @@ void gerar_roque_preto()
         {
             if (!casaEstaAtacada(e8, branco) && !casaEstaAtacada(d8, branco) && !casaEstaAtacada(c8, branco))
             {
-                printf("Roque grande %s%s\n", casa_nome[e8], casa_nome[c8]);
+                printf("%s%s Roque grande\n", casa_nome[e8], casa_nome[c8]);
             }
         }
     }
@@ -748,19 +748,21 @@ void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca)
 
         if (getBit(ocupacao_oponente, destino))
         {
-            printf("%s captura %s%s\n", nome_peca, casa_nome[origem], casa_nome[destino]);
+            printf("%s%s %s captura\n", casa_nome[origem], casa_nome[destino], nome_peca);
         }
         else
         {
-            printf("%s move %s%s\n", nome_peca, casa_nome[origem], casa_nome[destino]);
+            printf("%s%s move %s\n", casa_nome[origem], casa_nome[destino], nome_peca);
         }
 
         clearBit(ataques, destino);
     }
 }
 
-void gerar_lances()
+void gerar_lances(lances *listaLances)
 {
+    listaLances->contador = 0;
+
     for (int peca = P; peca <= k; peca++)
     {
         if (!bitboards[peca])
