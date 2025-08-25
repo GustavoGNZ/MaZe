@@ -824,3 +824,4 @@ void gerar_lances()
         }
     }
 }
+

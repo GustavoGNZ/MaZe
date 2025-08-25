@@ -20,11 +20,17 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    // parseFEN("r3k2r/p1ppqpb1/bnp1pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPpP/R3K2R b KQkq - 0 1");
-    parseFEN(posicaoTeste);
-    printTabuleiro();
-    gerar_lances();
-    
+    // // parseFEN("r3k2r/p1ppqpb1/bnp1pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPpP/R3K2R b KQkq - 0 1");
+    // parseFEN(posicaoTeste);
+    // printTabuleiro();
+    // gerar_lances();
+
+    lances listaLances[1];
+    listaLances->contador = 0;
+
+    adicionarLance(listaLances, codificar_lance(d7, e8, P, Q, 1, 0, 0, 0));
+
+    printListaLances(listaLances);
 
     return 0;
 }

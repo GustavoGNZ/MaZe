@@ -32,6 +32,10 @@ const char *casa_nome[] = {
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"};
 
+const char pecas_promocao[] = {[Q] = 'q', [R] = 'r', [B] = 'b', [N] = 'n', [q] = 'q', [r] = 'r', [b] = 'b', [n] = 'n'}; // Peças de promoção para peões
+
+
+
 // Imprime o bitboard que representa o tabuleiro de xadrez.
 void printBitboard(u64 bitboard)
 {
@@ -254,3 +258,33 @@ int contarBits(u64 bitboard)
 
     return count;
 }
+
+void adicionarLance(lances *listaLances, int lance) {
+    if (listaLances->contador < 256) { // Verifica se há espaço na lista
+        listaLances->lances[listaLances->contador] = lance;
+        listaLances->contador++;
+    }
+}
+// uci
+void printLance(int lance){
+    printf("%s%s%c", casa_nome[get_origem(lance)], casa_nome[get_destino(lance)], get_peca_promovida(lance) ? pecas_promocao[get_peca_promovida(lance)] : ' ');
+}
+
+void printListaLances(lances *listaLances) {
+    
+    printf("\n move piece, capture, double push, en passant, castling\n");
+
+    for (int i = 0; i < listaLances->contador; i++) {
+        int lance = listaLances->lances[i];
+        printf("%s%s%c, %c, %d, %d, %d, %d\n", 
+               casa_nome[get_origem(lance)], 
+               casa_nome[get_destino(lance)], 
+               get_peca_promovida(lance) ? pecas_promocao[get_peca_promovida(lance)] : ' ',
+               pecas_ascii[get_peca(lance)],
+               get_captura(lance) ? 1 : 0,
+               get_double_push(lance) ? 1 : 0,
+               get_en_passant(lance) ? 1 : 0,
+               get_roque(lance) ? 1 : 0);
+    }
+}
+

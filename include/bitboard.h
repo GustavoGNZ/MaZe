@@ -10,6 +10,18 @@
 #define clearBit(bitboard, casa) (bitboard &= ~(1ULL << casa))
 #define getLeastBitIndex(bitboard) (__builtin_ctzll(bitboard)) // Retorna o índice do bit menos significativo
 
+#define codificar_lance(origem, destino, peca, peca_promovida, captura, double_push, en_passant, roque) \
+    (origem | (destino << 6) | (peca << 12) | (peca_promovida << 16) | (captura << 20) | (double_push << 21) | (en_passant << 22) | (roque << 23))
+
+#define get_origem(lance) (lance & 0x3F)
+#define get_destino(lance) ((lance >> 6) & 0x3F)
+#define get_peca(lance) ((lance >> 12) & 0xF)
+#define get_peca_promovida(lance) ((lance >> 16) & 0xF)
+#define get_captura(lance) ((lance & 0x100000) )
+#define get_double_push(lance) ((lance & 0x200000) )
+#define get_en_passant(lance) ((lance & 0x400000) )
+#define get_roque(lance) ((lance & 0x800000) )
+
 extern const char *casa_nome[]; // Mapeamento de casas do tabuleiro
 
 
@@ -24,6 +36,13 @@ extern int roque;
 extern const char pecas_ascii[]; // Representação ASCII das peças
 extern const char *pecas_unicode[]; // Representação Unicode das peças
 extern int pecas_char[]; // Mapeamento de peças para caracteres
+extern const char pecas_promocao[]; // Peças de promoção
+
+typedef struct {
+    int lances[256]; // array para armazenar os lances gerados
+    int contador; // contador de lances gerados
+
+} lances;
 
 // Função utilitária
 void printBitboard(u64 bitboard); // Imprime o bitboard que representa o tabuleiro de xadrez
@@ -31,7 +50,9 @@ void printTabuleiro();            // Imprime o tabuleiro a partir do bitboard
 void printCasasAtacadasPeloLado(int lado);
 void parseFEN(char *fen); // Analisador sintático de FEN (Forsyth-Edwards Notation)
 int contarBits(u64 bitboard); // Conta o número de bits setados no bitboard
-
+void printLance(int lance); // Imprime um lance codificado
+void printListaLances(lances *listaLances); // Imprime a lista de lances
+void adicionarLance(lances *listaLances, int lance);
 // Enumerações para casas e lados
 enum { a1, b1, c1, d1, e1, f1, g1, h1,
        a2, b2, c2, d2, e2, f2, g2, h2,
@@ -65,6 +86,20 @@ enum { reiBranco_alaRei = 1, reiBranco_alaDama = 2, reiBranco_alaRei_alaDama = 3
 enum { P, N, B, R, Q, K, p, n, b, r, q, k }; // peças no bitboard (maiúsculas para brancas e minúsculas para pretas)
 // usando notacao em ingles por exemplo: P = Pawn, N = Knight, B = Bishop, R = Rook, Q = Queen, K = King
 
+
+
+/* formato binario para movimentos
+
+    0000 0000 0000 0000 0011 1111 origem 6bits hex 0x3F
+    0000 0000 0000 1111 1100 0000 destino 6bits hex 0xFC0
+    0000 0000 1111 0000 0000 0000 peca 4bits hex 0xF000
+    0000 1111 0000 0000 0000 0000 peca promovida 4bits hex 0xF000
+    0001 0000 0000 0000 0000 0000 flag captura 1bit hex 0x100000 
+    0010 0000 0000 0000 0000 0000 flag double push 1bit hex 0x200000
+    0100 0000 0000 0000 0000 0000 flag en passant 1bit hex 0x400000
+    1000 0000 0000 0000 0000 0000 flag roque 1bit hex 0x800000
+
+*/
 
 
 #endif

@@ -31,7 +31,7 @@ const int bits_relevantes_torre[64] = {
     11, 10, 10, 10, 10, 10, 10, 11,
     12, 11, 11, 11, 11, 11, 11, 12};
 
-// gerado usando init_magic_numbers() em versoes anteriores do codigo e depois atualizado manualmente nesta variavel para nunca mais precisar procurar magic numbers para torre
+// gerado usando init_magic_numbers() em versoes anteriores do codigo e depois atualizado manualmente nesta variavel para nunca mais precisar procurar magic numbers para bispo
 u64 magics_bispo[64] = {
     0x40040844404084ULL,
     0x2004208a004208ULL,
@@ -166,5 +166,6 @@ u64 magics_torre[64] = {
     0x2006104900a0804ULL,
     0x1004081002402ULL,
 };
+
 
 
