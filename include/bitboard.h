@@ -2,6 +2,7 @@
 #define BITBOARD_H
 
 #include <stdio.h>
+#include <string.h> // Para memcpy
 
 #define u64 unsigned long long
 
@@ -100,6 +101,35 @@ enum { P, N, B, R, Q, K, p, n, b, r, q, k }; // peças no bitboard (maiúsculas 
     1000 0000 0000 0000 0000 0000 flag roque 1bit hex 0x800000
 
 */
+
+// Estrutura para backup do estado do jogo
+// Como usar: declare na main ou função relevante: estado_jogo backup;
+// salvar estado: SALVAR_ESTADO(backup);
+// restaurar estado: RESTAURAR_ESTADO(backup);
+typedef struct {
+    u64 bitboards_backup[12];  // Backup dos bitboards das peças
+    u64 ocupacoes_backup[3];   // Backup das ocupações
+    int lado_a_jogar_backup;   // Backup do lado a jogar
+    int en_passant_backup;     // Backup do en passant
+    int roque_backup;          // Backup dos direitos de roque
+} estado_jogo;
+
+// Macros para salvar e restaurar o estado do jogo
+#define SALVAR_ESTADO(backup) do { \
+    memcpy((backup).bitboards_backup, bitboards, sizeof(bitboards)); \
+    memcpy((backup).ocupacoes_backup, ocupacoes, sizeof(ocupacoes)); \
+    (backup).lado_a_jogar_backup = lado_a_jogar; \
+    (backup).en_passant_backup = en_passant; \
+    (backup).roque_backup = roque; \
+} while(0)
+
+#define RESTAURAR_ESTADO(backup) do { \
+    memcpy(bitboards, (backup).bitboards_backup, sizeof(bitboards)); \
+    memcpy(ocupacoes, (backup).ocupacoes_backup, sizeof(ocupacoes)); \
+    lado_a_jogar = (backup).lado_a_jogar_backup; \
+    en_passant = (backup).en_passant_backup; \
+    roque = (backup).roque_backup; \
+} while(0)
 
 
 #endif
