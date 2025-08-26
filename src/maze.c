@@ -20,15 +20,14 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    // // parseFEN("r3k2r/p1ppqpb1/bnp1pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPpP/R3K2R b KQkq - 0 1");
+    // Testando com uma posição que tenha promoção de peão branco
     parseFEN("r3k2r/pPppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
     printTabuleiro();
 
     lances listaLances[1];
 
     gerar_lances(listaLances);
-
-
+    printListaLances(listaLances);
 
     return 0;
 }

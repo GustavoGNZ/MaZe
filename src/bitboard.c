@@ -277,19 +277,28 @@ void printListaLances(lances *listaLances) {
         return;
     }
 
-    printf("\n move piece, capture, double push, en passant, castling\n");
+    printf("\n");
+    printf("┌─────┬──────┬─────┬─────┬──────┬─────────┬────────────┬──────────┐\n");
+    printf("│ No. │ Move │ Peca│ Cap │ Duplo│ En Pass │  Castling  │  Promocao│\n");
+    printf("├─────┼──────┼─────┼─────┼──────┼─────────┼────────────┼──────────┤\n");
 
     for (int i = 0; i < listaLances->contador; i++) {
         int lance = listaLances->lances[i];
-        printf("%s%s%c, %c, %d, %d, %d, %d\n", 
+        char promocao = get_peca_promovida(lance) ? pecas_promocao[get_peca_promovida(lance)] : ' ';
+        
+        printf("│%4d │ %s%s │  %c  │  %c  │  %c   │   %c     │     %c      │    %c     │\n", 
+               i + 1,
                casa_nome[get_origem(lance)], 
                casa_nome[get_destino(lance)], 
-               get_peca_promovida(lance) ? pecas_promocao[get_peca_promovida(lance)] : ' ',
                pecas_ascii[get_peca(lance)],
-               get_captura(lance) ? 1 : 0,
-               get_double_push(lance) ? 1 : 0,
-               get_en_passant(lance) ? 1 : 0,
-               get_roque(lance) ? 1 : 0);
+               get_captura(lance) ? 'S' : 'N',
+               get_double_push(lance) ? 'S' : 'N',
+               get_en_passant(lance) ? 'S' : 'N',
+               get_roque(lance) ? 'S' : 'N',
+               promocao);
     }
+    
+    printf("└─────┴──────┴─────┴─────┴──────┴─────────┴────────────┴──────────┘\n");
+    printf("Total de lances: %d\n", listaLances->contador);
 }
 
