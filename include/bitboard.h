@@ -33,6 +33,8 @@ extern u64 ocupacoes[3]; // Ocupações do tabuleiro (brancas, pretas e ambos)
 extern int lado_a_jogar;
 extern int en_passant;
 extern int roque;
+extern int roque_permissoes[64];
+
 
 extern const char pecas_ascii[]; // Representação ASCII das peças
 extern const char *pecas_unicode[]; // Representação Unicode das peças
@@ -71,15 +73,19 @@ enum { peao, cavalo, bispo, torre, dama, rei }; // lidar com pecas em alto nivel
 
     0001 = rei branco ala rei 1
     0010 = rei branco ala dama 2
+
+    0011 = rei branco ala rei e dama 3
+
     0100 = rei preto ala rei 4
     1000 = rei preto ala dama 8
 
-    0011 = rei branco ala rei e dama 3
     1100 = rei preto ala rei e dama 12 
+
     1111 = ambos os lados com roque 15
     0000 = nenhum roque
 
-*/ 
+*/
+
 
 enum { reiBranco_alaRei = 1, reiBranco_alaDama = 2, reiBranco_alaRei_alaDama = 3, 
        reiPreto_alaRei = 4, reiPreto_alaDama = 8, reiPreto_alaRei_alaDama = 12, ambosReisLadosRoque = 15}; // roques
@@ -87,6 +93,7 @@ enum { reiBranco_alaRei = 1, reiBranco_alaDama = 2, reiBranco_alaRei_alaDama = 3
 enum { P, N, B, R, Q, K, p, n, b, r, q, k }; // peças no bitboard (maiúsculas para brancas e minúsculas para pretas)
 // usando notacao em ingles por exemplo: P = Pawn, N = Knight, B = Bishop, R = Rook, Q = Queen, K = King
 
+enum { todosLances, lancesCaptura}; // tipos de lances para busca
 
 
 /* formato binario para movimentos

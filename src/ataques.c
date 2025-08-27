@@ -710,29 +710,30 @@ void gerar_roque_preto(lances *listaLances)
 void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca, lances *listaLances)
 {
     u64 ataques;
-    
+
     // Obtém os ataques baseado no tipo da peça
-    switch (tipo_peca) {
-        case N:
-        case n:
-            ataques = tabela_ataques_cavalo[origem];
-            break;
-        case B:
-        case b:
-            ataques = obterAtaquesBispo(origem, ocupacoes[ambos]);
-            break;
-        case R:
-        case r:
-            ataques = obterAtaquesTorre(origem, ocupacoes[ambos]);
-            break;
-        case Q:
-        case q:
-            ataques = obterAtaquesDama(origem, ocupacoes[ambos]);
-            break;
-        default:
-            return; // Tipo de peça inválido
+    switch (tipo_peca)
+    {
+    case N:
+    case n:
+        ataques = tabela_ataques_cavalo[origem];
+        break;
+    case B:
+    case b:
+        ataques = obterAtaquesBispo(origem, ocupacoes[ambos]);
+        break;
+    case R:
+    case r:
+        ataques = obterAtaquesTorre(origem, ocupacoes[ambos]);
+        break;
+    case Q:
+    case q:
+        ataques = obterAtaquesDama(origem, ocupacoes[ambos]);
+        break;
+    default:
+        return; // Tipo de peça inválido
     }
-    
+
     // Remove casas ocupadas pelo próprio lado
     ataques &= ~ocupacoes[lado];
     u64 ocupacao_oponente = (lado == branco) ? ocupacoes[preto] : ocupacoes[branco];
@@ -752,6 +753,139 @@ void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca, lances *li
 
         clearBit(ataques, destino);
     }
+}
+
+int fazer_lance(int lance, int flag, estado_jogo backup)
+{
+
+    if (flag == todosLances)
+    {
+
+        SALVAR_ESTADO(backup);
+
+        int origem = get_origem(lance);
+        int destino = get_destino(lance);
+        int peca = get_peca(lance);
+        int promocao = get_peca_promovida(lance);
+        int captura = get_captura(lance);
+        int movimento_duplo = get_double_push(lance);
+        int en_passant_flag = get_en_passant(lance);
+        int roque_flag = get_roque(lance);
+
+        clearBit(bitboards[peca], origem);
+        setBit(bitboards[peca], destino);
+
+        if (captura)
+        {
+            int pecaInicial, pecaFinal;
+            if (lado_a_jogar == branco)
+            {
+                pecaInicial = p;
+                pecaFinal = k;
+            }
+            else
+            {
+                pecaInicial = P;
+                pecaFinal = K;
+            }
+            for (int peca = pecaInicial; peca <= pecaFinal; peca++)
+            {
+                if (getBit(bitboards[peca], destino))
+                {
+                    clearBit(bitboards[peca], destino);
+                    break;
+                }
+            }
+        }
+
+        if (promocao)
+        {
+            if ( lado_a_jogar == branco) {
+                clearBit(bitboards[P], destino);
+            } else {
+                clearBit(bitboards[p], destino);
+            }
+
+            setBit(bitboards[promocao], destino);
+        }
+
+        if(en_passant_flag) {
+            if (lado_a_jogar == branco) {
+                clearBit(bitboards[p], destino - 8);
+            } else {
+                clearBit(bitboards[P], destino + 8);
+            }
+        }   
+
+        en_passant = -999;
+
+        if (movimento_duplo)
+        {
+            if (lado_a_jogar == branco)
+            {
+                en_passant = origem + 8;
+            }
+            else
+            {
+                en_passant = origem - 8;
+            }
+        }
+
+        if (roque_flag)
+        {
+            if (lado_a_jogar == branco)
+            {
+                // Roque pequeno
+                if (destino == g1)
+                {
+                    clearBit(bitboards[R], h1);
+                    setBit(bitboards[R], f1);
+                }
+                // Roque grande
+                else if (destino == c1)
+                {
+                    clearBit(bitboards[R], a1);
+                    setBit(bitboards[R], d1);
+                }
+            }
+            else
+            {
+                // Roque pequeno
+                if (destino == g8)
+                {
+                    clearBit(bitboards[r], h8);
+                    setBit(bitboards[r], f8);
+                }
+                // Roque grande
+                else if (destino == c8)
+                {
+                    clearBit(bitboards[r], a8);
+                    setBit(bitboards[r], d8);
+                }
+            }
+        }
+
+        //roque
+
+        roque &= roque_permissoes[origem];
+        roque &= roque_permissoes[destino];
+        printf("roque: %d\n", roque);
+
+
+    }
+    else
+    {
+        if (get_captura(lance))
+        {
+            fazer_lance(lance, todosLances, backup);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+
 }
 
 void gerar_lances(lances *listaLances)
@@ -821,4 +955,3 @@ void gerar_lances(lances *listaLances)
         }
     }
 }
-

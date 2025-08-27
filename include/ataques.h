@@ -49,6 +49,7 @@ void gerar_roque_branco(lances *listaLances);
 void gerar_roque_preto(lances *listaLances);
 void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca, lances *listaLances);
 void gerar_lances(lances *listaLances);
+int fazer_lance(int lance, int flag, estado_jogo backup);
 
 
 #endif

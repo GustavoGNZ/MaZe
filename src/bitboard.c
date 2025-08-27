@@ -9,6 +9,17 @@ int lado_a_jogar;
 int en_passant = -999; // Valor padrão para indicar que não há en passant
 int roque = 0; // Valor padrão para indicar que não há roque
 
+int roque_permissoes[64] = {
+    7,15,15,15,15,15,15,11,
+    15,15,15,15,15,15,15,15,
+    15,15,15,15,15,15,15,15,
+    15,15,15,15,15,15,15,15,
+    15,15,15,15,15,15,15,15,
+    15,15,15,15,15,15,15,15,
+    15,15,15,15,15,15,15,15,
+    13,15,15,15,12,15,15,14
+};
+
 const char pecas_ascii[] = {
     'P', 'N', 'B', 'R', 'Q', 'K', // Peças brancas
     'p', 'n', 'b', 'r', 'q', 'k'  // Peças pretas
@@ -110,6 +121,13 @@ void printTabuleiro()
 
     printf("Roque: ");
     // Exibe roques de forma compacta: KQkq (K=branco rei, Q=branco dama, k=preto rei, q=preto dama)
+    // printf("%d\n", roque);
+    // printf("%d\n", roque & reiBranco_alaRei);
+    // printf("%d\n", roque & reiBranco_alaDama);
+    // printf("%d\n", roque & reiPreto_alaRei);
+    // printf("%d\n", roque & reiPreto_alaDama);
+
+
     printf("%c", (roque & reiBranco_alaRei)     ? 'K' : '-');
     printf("%c", (roque & reiBranco_alaDama)    ? 'Q' : '-');
     printf("%c", (roque & reiPreto_alaRei)      ? 'k' : '-');
