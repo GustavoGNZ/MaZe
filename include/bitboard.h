@@ -71,6 +71,23 @@ enum { peao, cavalo, bispo, torre, dama, rei }; // lidar com pecas em alto nivel
 
 /* Enumerações para roques
 
+    K = 1
+    Q = 2
+    KQ = 3
+    k = 4
+    Kk = 5
+    Qk = 6
+    KQk = 7
+    q = 8
+    Kq = 9
+    Qq = 10
+    KQq = 11
+    kq = 12
+    Kkq = 13
+    Qkq = 14
+    KQkq = 15
+    
+
     0001 = rei branco ala rei 1
     0010 = rei branco ala dama 2
 

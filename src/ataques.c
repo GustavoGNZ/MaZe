@@ -730,6 +730,10 @@ void gerar_movimentos_pecaGrande(int origem, int lado, int tipo_peca, lances *li
     case q:
         ataques = obterAtaquesDama(origem, ocupacoes[ambos]);
         break;
+    case K:
+    case k:
+        ataques = tabela_ataques_rei[origem];
+        break;
     default:
         return; // Tipo de peça inválido
     }
@@ -866,10 +870,8 @@ int fazer_lance(int lance, int flag, estado_jogo backup)
         }
 
         //roque
-
         roque &= roque_permissoes[origem];
         roque &= roque_permissoes[destino];
-        printf("roque: %d\n", roque);
 
 
     }
@@ -912,9 +914,15 @@ void gerar_lances(lances *listaLances)
             else if (peca == K)
             {
                 gerar_roque_branco(listaLances);
-                // TODO: Adicionar movimentos normais do rei depois
+                u64 bitboardCopia = bitboards[peca];
+                while (bitboardCopia)
+                {
+                    int origem = getLeastBitIndex(bitboardCopia);
+                    gerar_movimentos_pecaGrande(origem, branco, peca, listaLances);
+                    clearBit(bitboardCopia, origem);
+                }
             }
-            else if (peca == N || peca == B || peca == R || peca == Q)
+            else if (peca == N || peca == B || peca == R || peca == Q )
             {
                 u64 bitboardCopia = bitboards[peca];
                 while (bitboardCopia)
@@ -940,7 +948,13 @@ void gerar_lances(lances *listaLances)
             else if (peca == k)
             {
                 gerar_roque_preto(listaLances);
-                // TODO: Adicionar movimentos normais do rei depois
+                u64 bitboardCopia = bitboards[peca];
+                while (bitboardCopia)
+                {
+                    int origem = getLeastBitIndex(bitboardCopia);
+                    gerar_movimentos_pecaGrande(origem, preto, peca, listaLances);
+                    clearBit(bitboardCopia, origem);
+                }
             }
             else if (peca == n || peca == b || peca == r || peca == q)
             {

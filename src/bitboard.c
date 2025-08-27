@@ -10,14 +10,14 @@ int en_passant = -999; // Valor padrão para indicar que não há en passant
 int roque = 0; // Valor padrão para indicar que não há roque
 
 int roque_permissoes[64] = {
-    7,15,15,15,15,15,15,11,
+    13,15,15,15,12,15,15,14,  // Linha 1: a1=13(remove Q), e1=12(remove KQ), h1=14(remove K)
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
-    13,15,15,15,12,15,15,14
+    7,15,15,15,3,15,15,11    // Linha 8: a8=7(remove q), e8=3(remove kq), h8=11(remove k)
 };
 
 const char pecas_ascii[] = {
