@@ -5,6 +5,7 @@
 
 // Funcoes de geração de números aleatórios
 void runEngine();
+int get_tempo_milisegundos();
 unsigned int gerarNumeroAleatorio32bits();
 u64 gerarNumeroAleatorio64bits();
 void inicializarMagicNumbers();

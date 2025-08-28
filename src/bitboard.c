@@ -45,7 +45,7 @@ const char *casa_nome[] = {
 
 const char pecas_promocao[] = {[Q] = 'q', [R] = 'r', [B] = 'b', [N] = 'n', [q] = 'q', [r] = 'r', [b] = 'b', [n] = 'n'}; // Peças de promoção para peões
 
-
+long nos;
 
 // Imprime o bitboard que representa o tabuleiro de xadrez.
 void printBitboard(u64 bitboard)
@@ -320,3 +320,31 @@ void printListaLances(lances *listaLances) {
     printf("Total de lances: %d\n", listaLances->contador);
 }
 
+void perft(int profundidade) {
+    if (profundidade == 0) {
+        nos++;
+        return;
+    }
+
+    lances listaLances;
+
+    gerar_lances(&listaLances);
+
+    for (int i = 0; i < listaLances.contador; i++) {
+        int lance = listaLances.lances[i];
+
+        // Salva o estado atual
+        estado_jogo backup;
+        SALVAR_ESTADO(backup);
+
+        if (!fazer_lance(lance, todosLances, backup)) {
+            continue; // Lance inválido, tenta o próximo
+        }
+
+        perft(profundidade - 1);
+
+        // Restaura o estado anterior
+        RESTAURAR_ESTADO(backup);
+    }
+
+}   

@@ -34,7 +34,7 @@ extern int lado_a_jogar;
 extern int en_passant;
 extern int roque;
 extern int roque_permissoes[64];
-
+extern long nos;
 
 extern const char pecas_ascii[]; // Representação ASCII das peças
 extern const char *pecas_unicode[]; // Representação Unicode das peças
@@ -56,6 +56,8 @@ int contarBits(u64 bitboard); // Conta o número de bits setados no bitboard
 void printLance(int lance); // Imprime um lance codificado
 void printListaLances(lances *listaLances); // Imprime a lista de lances
 void adicionarLance(lances *listaLances, int lance);
+void perft(int profundidade);
+
 // Enumerações para casas e lados
 enum { a1, b1, c1, d1, e1, f1, g1, h1,
        a2, b2, c2, d2, e2, f2, g2, h2,

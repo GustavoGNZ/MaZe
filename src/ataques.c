@@ -4,6 +4,15 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
+
+
+int get_tempo_milisegundos()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
 
 // Variável global para armazenar o estado do gerador de números aleatórios
 unsigned int num_aleatorio = 1804289383;
@@ -873,6 +882,25 @@ int fazer_lance(int lance, int flag, estado_jogo backup)
         roque &= roque_permissoes[origem];
         roque &= roque_permissoes[destino];
 
+        // ocupacoes
+        memset(ocupacoes, 0ULL, sizeof(ocupacoes));
+        for (int peca = P; peca <= k; peca++){
+            ocupacoes[peca <= K ? branco : preto] |= bitboards[peca];
+        }
+        ocupacoes[ambos] |= ocupacoes[branco];
+        ocupacoes[ambos] |= ocupacoes[preto];
+
+        // mudar lado a jogar
+        lado_a_jogar ^= 1; 
+
+        // verificar se o rei do lado que acabou de jogar ficou em cheque
+        if(casaEstaAtacada((lado_a_jogar == branco) ? getLeastBitIndex(bitboards[k]) : getLeastBitIndex(bitboards[K]), lado_a_jogar)) {
+            // o rei ficou em cheque, desfaz o lance
+            RESTAURAR_ESTADO(backup);
+            return 0;
+        } else {
+            return 1;
+        }
 
     }
     else
