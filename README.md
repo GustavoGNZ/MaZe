@@ -18,13 +18,29 @@ Este projeto tem como objetivo estudar e implementar os princípios fundamentais
 - Representação de peças e tabuleiro com **bitboards**.
 - Geração de ataques previamente computados.
 - Uso de técnicas de otimização e possibilidade de análise de algoritmos como **Minimax**, **Alpha-Beta Pruning**.
+- Metaheurísticas.
 
 ---
+
+## 🧠 Funcionalidades Atuais
+
+- Representação do tabuleiro via bitboard.
+- Geração dos ataques de todas as peças.
+- Geração de jogadas legais e direitos de Roque, EnPassant e verificar se o Rei está em cheque.
+- Parser de strings em notação FEN para representar os tabuleiros em bitboard
+- Restaurar estado do tabuleiro utilizando Backups caso um lance ilegal seja feito.
+
+## 📈 Planejamento Futuro
+
+- Implementação de algoritmos de busca:
+  - Minimax
+  - Poda Alpha-Beta
+- Avaliação de posições e heurísticas simples
+- Suporte ao protocolo UCI
 
 ## ⚙️ Compilação
 
 ### 🔧 Requisitos
-
 - Compilador C (`gcc`)
 - `make` instalado
 
@@ -33,25 +49,7 @@ Este projeto tem como objetivo estudar e implementar os princípios fundamentais
 ```bash
 # Compilar a versão otimizada
 make
-
-# Compilar com suporte a debug
-make debug
 ```
-
-
-## 🧠 Funcionalidades Atuais
-
-- Representação do tabuleiro via bitboard
-- Geração de ataques de peões e cavalos.
-
-## 📈 Planejamento Futuro
-
-- Geração de jogadas legais e movimentação
-- Implementação de algoritmos de busca:
-  - Minimax
-  - Poda Alpha-Beta
-- Avaliação de posições e heurísticas simples
-- Suporte ao protocolo UCI
 
 ## 💻 Instalação
 
