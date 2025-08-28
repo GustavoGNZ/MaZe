@@ -14,7 +14,6 @@
 #define enPassantBranco "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
 #define enPassantPreto "rnbqkbnr/pppp1ppp/8/8/3Pp3/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 3"
 
-
 int main()
 {
     u64 tabuleiro = 0ULL;
@@ -26,6 +25,26 @@ int main()
     estado_jogo backup;
     lances listaLances[1];
 
+    gerar_lances(listaLances);
+    printListaLances(listaLances);
+
+    // for (int i = 0; i < listaLances->contador; i++)
+    // {
+    //     int lance = listaLances->lances[i];
+    //     SALVAR_ESTADO(backup);
+
+    //     
+    //     if (!fazer_lance(lance, todosLances, backup))
+    //     {
+    //         continue;
+    //     }
+    //     printTabuleiro();
+    //     getchar();
+    //     RESTAURAR_ESTADO(backup);
+    //     printTabuleiro();
+    //     getchar();
+    // }
+
+
     return 0;
 }
-                                                                                                                        
