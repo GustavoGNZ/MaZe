@@ -348,3 +348,46 @@ void perft(int profundidade) {
     }
 
 }   
+
+void perft_teste(int profundidade) {
+    if (profundidade == 0) {
+        nos++;
+        return;
+    }
+
+    lances listaLances;
+
+    gerar_lances(&listaLances);
+
+    int inicio = get_tempo_milisegundos();
+
+    for (int i = 0; i < listaLances.contador; i++) {
+        int lance = listaLances.lances[i];
+
+        // Salva o estado atual
+        estado_jogo backup;
+        SALVAR_ESTADO(backup);
+
+        if (!fazer_lance(lance, todosLances, backup)) {
+            continue; // Lance inválido, tenta o próximo
+        }
+
+        long nos_antes = nos;
+
+        perft(profundidade - 1);
+
+        long nos_antigos = nos - nos_antes;
+
+        // Restaura o estado anterior
+        RESTAURAR_ESTADO(backup);
+        printLance(lance);
+        printf("nos : %ld\n", nos_antigos);
+
+    }
+
+    printf("\nProfundidade: %d\n", profundidade);
+    printf("Nos: %ld\n", nos);
+    printf("Tempo: %d ms\n", get_tempo_milisegundos() - inicio);
+    printf("\n");
+
+}   

@@ -57,6 +57,7 @@ void printLance(int lance); // Imprime um lance codificado
 void printListaLances(lances *listaLances); // Imprime a lista de lances
 void adicionarLance(lances *listaLances, int lance);
 void perft(int profundidade);
+void perft_teste(int profundidade);
 
 // Enumerações para casas e lados
 enum { a1, b1, c1, d1, e1, f1, g1, h1,

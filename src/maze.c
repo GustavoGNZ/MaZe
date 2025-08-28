@@ -20,36 +20,11 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(posicaoTeste);
+    parseFEN(posicaoInicial);
     printTabuleiro();
 
-    // Exemplo de uso das macros de backup
     estado_jogo backup;
-
     lances listaLances[1];
-
-    gerar_lances(listaLances);
-    printListaLances(listaLances);
-
-    int inicio = get_tempo_milisegundos();
-
-    perft(4);
-
-    for (int i = 0; i < listaLances->contador; i++)
-    {
-        int lance = listaLances->lances[i];
-        SALVAR_ESTADO(backup);
-
-        if(!fazer_lance(lance, todosLances, backup)) {
-           continue;
-        } 
-        printTabuleiro();
-        RESTAURAR_ESTADO(backup);
-        printTabuleiro();
-
-    }
-
-    printf("nos: %ld\n", nos);
 
     return 0;
 }
