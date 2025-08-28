@@ -1,6 +1,7 @@
 #include "../include/bitboard.h"
 #include "../include/ataques.h"
 #include "../include/globals.h"
+#include "../include/uci.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,6 +45,8 @@ int main()
     //     printTabuleiro();
     //     getchar();
     // }
+
+    parse_move("e2e4");
 
 
     return 0;
