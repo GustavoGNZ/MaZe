@@ -7,7 +7,7 @@
 // posicoes fen para teste
 #define posicaoVazia "8/8/8/8/8/8/8/8 w - - 0 1"
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-#define posicaoTeste "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1"
+#define posicaoTeste "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "
 #define RUYLOPEZ "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"
 
 // FENs para testar en passant
@@ -33,7 +33,7 @@ int main()
 
     int inicio = get_tempo_milisegundos();
 
-    perft(1);
+    perft(4);
 
     for (int i = 0; i < listaLances->contador; i++)
     {
@@ -44,10 +44,8 @@ int main()
            continue;
         } 
         printTabuleiro();
-        getchar();
         RESTAURAR_ESTADO(backup);
         printTabuleiro();
-        getchar();
 
     }
 
