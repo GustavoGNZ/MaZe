@@ -24,11 +24,32 @@ Este projeto tem como objetivo estudar e implementar os princípios fundamentais
 
 ## 🧠 Funcionalidades Atuais
 
-- Representação do tabuleiro via bitboard.
-- Geração dos ataques de todas as peças.
-- Geração de jogadas legais e direitos de Roque, EnPassant e verificar se o Rei está em cheque.
-- Parser de strings em notação FEN para representar os tabuleiros em bitboard
-- Restaurar estado do tabuleiro utilizando Backups caso um lance ilegal seja feito.
+- **Representação do tabuleiro via bitboard**: Sistema eficiente de representação usando 64-bit integers
+- **Geração dos ataques de todas as peças**: Ataques pré-computados para otimização
+- **Geração de jogadas legais**: Inclui direitos de Roque, En Passant e verificação de xeque
+- **Parser de strings em notação FEN**: Conversão de posições FEN para representação bitboard
+- **Sistema de backup**: Restauração de estado do tabuleiro para desfazer lances ilegais
+- **Protocolo UCI básico**: Parsing de comandos UCI incluindo position e moves
+- **Documentação completa**: Código totalmente documentado com comentários em português
+
+## 📁 Estrutura do Projeto
+
+```
+MaZe/
+├── src/
+│   ├── maze.c          # Função principal e testes
+│   ├── bitboard.c      # Operações com bitboards
+│   ├── ataques.c       # Geração de ataques das peças
+│   ├── globals.c       # Variáveis globais e estado do jogo
+│   └── uci.c           # Implementação do protocolo UCI
+├── include/
+│   ├── bitboard.h      # Definições de bitboard
+│   ├── ataques.h       # Declarações de funções de ataque
+│   ├── globals.h       # Variáveis globais e estruturas
+│   └── uci.h           # Funções do protocolo UCI
+├── makefile            # Script de compilação
+└── README.md           # Este arquivo
+```
 
 ## 📈 Planejamento Futuro
 
@@ -36,19 +57,38 @@ Este projeto tem como objetivo estudar e implementar os princípios fundamentais
   - Minimax
   - Poda Alpha-Beta
 - Avaliação de posições e heurísticas simples
-- Suporte ao protocolo UCI
+- Protocolo UCI completo (go, stop, etc.)
+- Interface gráfica ou integração com GUIs populares
 
-## ⚙️ Compilação
+## ⚙️ Compilação e Uso
 
 ### 🔧 Requisitos
 - Compilador C (`gcc`)
-- `make` instalado
+- `make` instalado (opcional)
 
 ### 🚀 Comandos
 
 ```bash
 # Compilar a versão otimizada
 make
+
+# Ou compilar manualmente
+gcc -Ofast -Iinclude -o maze src/*.c
+
+# Executar o engine
+./maze
+
+# Testar com comando UCI
+echo "uci" | ./maze
+```
+
+### 🎮 Exemplo de Uso
+
+```bash
+# Executar uma sequência de movimentos
+./maze
+# No engine, use comandos como:
+# position startpos moves e2e4 e7e5 g1f3
 ```
 
 ## 💻 Instalação

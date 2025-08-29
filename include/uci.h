@@ -40,6 +40,18 @@
  */
 int parse_move(char *string_lance);
 
+/**
+ * @brief Processa comando UCI "position"
+ * 
+ * Analisa e configura a posição do tabuleiro baseada no comando UCI.
+ * Suporta tanto "position startpos" quanto "position fen <fen_string>".
+ * Também processa a lista de movimentos se fornecida.
+ * 
+ * @param string_posicao String completa do comando position
+ * @param backup Estrutura para backup do estado do jogo
+ */
+void parse_position(char *string_posicao, estado_jogo backup);
+
 // =============================================================================
 // FUNÇÕES DE COMUNICAÇÃO UCI (FUTURAS IMPLEMENTAÇÕES)
 // =============================================================================

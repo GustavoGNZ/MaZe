@@ -8,7 +8,7 @@
 // posicoes fen para teste
 #define posicaoVazia "8/8/8/8/8/8/8/8 w - - 0 1"
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-#define posicaoTeste "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "
+#define posicaoTeste "r3k2r/pPppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "
 #define RUYLOPEZ "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"
 
 // FENs para testar en passant
@@ -20,33 +20,18 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(posicaoInicial);
     printTabuleiro();
 
     estado_jogo backup;
     lances listaLances[1];
 
-    gerar_lances(listaLances);
-    printListaLances(listaLances);
+    // gerar_lances(listaLances);
+    // printListaLances(listaLances);
 
-    // for (int i = 0; i < listaLances->contador; i++)
-    // {
-    //     int lance = listaLances->lances[i];
-    //     SALVAR_ESTADO(backup);
+    parse_position("position startpos", backup);
+    printTabuleiro();
 
-    //     
-    //     if (!fazer_lance(lance, todosLances, backup))
-    //     {
-    //         continue;
-    //     }
-    //     printTabuleiro();
-    //     getchar();
-    //     RESTAURAR_ESTADO(backup);
-    //     printTabuleiro();
-    //     getchar();
-    // }
 
-    parse_move("e2e4");
 
 
     return 0;
