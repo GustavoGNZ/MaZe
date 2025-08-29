@@ -30,6 +30,7 @@ int main()
 
     parse_position("position startpos", backup);
     printTabuleiro();
+    parse_go("go depth 50");
 
 
 

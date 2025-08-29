@@ -152,3 +152,40 @@ void parse_position(char *string_posicao, estado_jogo backup)
         }
     }
 }
+
+void parse_go(char *string_go)
+{
+    int profundidade = -1;
+
+    char *profundidade_atual = NULL;
+
+    if((profundidade_atual = strstr(string_go, "depth"))) {
+        profundidade = atoi(profundidade_atual + 6);
+    } else {
+        profundidade = 5; // valor padrão
+    }
+
+    
+
+    // buscar melhor lance
+    // chamada funcao
+
+    printf("profundidade: %d\n", profundidade);
+
+}
+
+void uci_loop()
+{
+
+    setbuf(stdout, NULL); // Desabilita buffering na saída padrão
+    setbuf(stdin, NULL);  // Desabilita buffering na entrada padrão
+
+    char comando[4096];
+
+    printf("id name MaZe 1.0\n");
+    printf("id author GustavoGNZ\n");
+    printf("uciok\n");
+
+    while(1);
+
+}

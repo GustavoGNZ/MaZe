@@ -52,8 +52,15 @@ int parse_move(char *string_lance);
  */
 void parse_position(char *string_posicao, estado_jogo backup);
 
-// =============================================================================
-// FUNÇÕES DE COMUNICAÇÃO UCI (FUTURAS IMPLEMENTAÇÕES)
-// =============================================================================
+/**
+ * @brief Processa comando UCI "go"
+ * 
+ * Analisa e executa o comando de busca UCI. Processa parâmetros como
+ * tempo de busca, profundidade, número de nós e outros controles.
+ * 
+ * @param string_go String completa do comando go
+ */
+void parse_go(char *string_go);
+
 
 #endif
