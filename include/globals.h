@@ -20,4 +20,7 @@ extern const int bits_relevantes_torre[64];
 extern  u64 magics_bispo[64];
 extern  u64 magics_torre[64];
 
+// Variável global para backup do estado do jogo
+extern estado_jogo backup_global;
+
 #endif

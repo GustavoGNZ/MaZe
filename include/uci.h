@@ -48,9 +48,8 @@ int parse_move(char *string_lance);
  * Também processa a lista de movimentos se fornecida.
  * 
  * @param string_posicao String completa do comando position
- * @param backup Estrutura para backup do estado do jogo
  */
-void parse_position(char *string_posicao, estado_jogo backup);
+void parse_position(char *string_posicao);
 
 /**
  * @brief Processa comando UCI "go"
@@ -62,5 +61,6 @@ void parse_position(char *string_posicao, estado_jogo backup);
  */
 void parse_go(char *string_go);
 
+void uci_loop();
 
 #endif

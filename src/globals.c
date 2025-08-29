@@ -1,5 +1,8 @@
 #include "../include/globals.h"
 
+// Variável global para backup do estado do jogo
+estado_jogo backup_global;
+
 u64 tabela_ataques_peao[2][64];
 u64 tabela_ataques_cavalo[64];
 u64 tabela_ataques_rei[64];

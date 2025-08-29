@@ -72,7 +72,7 @@ int parse_move(char *string_lance)
 }
 
 // uci
-void parse_position(char *string_posicao, estado_jogo backup)
+void parse_position(char *string_posicao)
 {
 
     string_posicao += 9; // pula "position "
@@ -103,19 +103,19 @@ void parse_position(char *string_posicao, estado_jogo backup)
     if (moves_token != NULL)
     {
         moves_token += 6; // pula "moves "
-        
+
         // Pula espaços iniciais
         while (*moves_token == ' ')
         {
             moves_token++;
         }
-        
+
         while (*moves_token != '\0')
         {
             // Extrai o lance atual (até o próximo espaço ou fim da string)
             char lance_str[8] = {0}; // buffer para o lance
             int i = 0;
-            
+
             // Copia caracteres do lance até encontrar espaço ou fim
             while (*moves_token != ' ' && *moves_token != '\0' && i < 7)
             {
@@ -124,14 +124,14 @@ void parse_position(char *string_posicao, estado_jogo backup)
                 i++;
             }
             lance_str[i] = '\0'; // termina a string
-            
+
             if (strlen(lance_str) >= 4) // lance válido deve ter pelo menos 4 caracteres
             {
                 int lance = parse_move(lance_str);
-                
+
                 if (lance != 0)
                 {
-                    if (!fazer_lance(lance, todosLances, backup))
+                    if (!fazer_lance(lance, todosLances, backup_global))
                     {
                         // printf("Erro ao executar lance: %s\n", lance_str);
                         break; // Erro ao executar lance
@@ -143,7 +143,7 @@ void parse_position(char *string_posicao, estado_jogo backup)
                     break; // Lance inválido
                 }
             }
-            
+
             // Pula espaços para o próximo lance
             while (*moves_token == ' ')
             {
@@ -159,18 +159,19 @@ void parse_go(char *string_go)
 
     char *profundidade_atual = NULL;
 
-    if((profundidade_atual = strstr(string_go, "depth"))) {
+    if ((profundidade_atual = strstr(string_go, "depth")))
+    {
         profundidade = atoi(profundidade_atual + 6);
-    } else {
+    }
+    else
+    {
         profundidade = 5; // valor padrão
     }
-
-    
 
     // buscar melhor lance
     // chamada funcao
 
-    printf("profundidade: %d\n", profundidade);
+    
 
 }
 
@@ -181,11 +182,49 @@ void uci_loop()
     setbuf(stdin, NULL);  // Desabilita buffering na entrada padrão
 
     char comando[4096];
+    while (1)
+    {
+        memset(comando, 0, sizeof(comando));
 
-    printf("id name MaZe 1.0\n");
-    printf("id author GustavoGNZ\n");
-    printf("uciok\n");
+        fflush(stdout);
 
-    while(1);
+        if (fgets(comando, sizeof(comando), stdin) == NULL)
+        {
+            continue; // Se falhar ao ler, tenta novamente
+        }
 
+        // Remove nova linha do final do comando
+        comando[strcspn(comando, "\n")] = 0;
+
+        // Processa o comando
+        if (strcmp(comando, "uci") == 0)
+        {
+            printf("id name MaZe 1.0\n");
+            printf("id author GustavoGNZ\n");
+            printf("uciok\n");
+        }
+        else if (strcmp(comando, "ucinewgame") == 0)
+        {
+            // Reinicia o jogo para uma nova partida
+            parse_position("position startpos");
+            // printTabuleiro();
+        }
+        else if (strncmp(comando, "isready", 7) == 0)
+        {
+            printf("readyok\n");
+        }
+        else if (strncmp(comando, "position", 8) == 0)
+        {
+            parse_position(comando);
+            // printTabuleiro();
+        }
+        else if (strncmp(comando, "go", 2) == 0)
+        {
+            parse_go(comando);
+        }
+        else if (strncmp(comando, "quit", 4) == 0)
+        {
+            break;
+        }
+    }
 }

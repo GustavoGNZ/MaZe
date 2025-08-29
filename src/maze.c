@@ -20,17 +20,14 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    printTabuleiro();
 
-    estado_jogo backup;
-    lances listaLances[1];
+    // printTabuleiro();
+    // lances listaLances[1];
 
     // gerar_lances(listaLances);
     // printListaLances(listaLances);
 
-    parse_position("position startpos", backup);
-    printTabuleiro();
-    parse_go("go depth 50");
+    uci_loop();
 
 
 
