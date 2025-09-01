@@ -2,6 +2,8 @@
 #include "../include/ataques.h"
 #include "../include/globals.h"
 #include "../include/uci.h"
+#include "../include/search.h"
+#include "../include/evaluate.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,6 +22,7 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
+    parseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     // printTabuleiro();
     // lances listaLances[1];
@@ -27,10 +30,10 @@ int main()
     // gerar_lances(listaLances);
     // printListaLances(listaLances);
 
-    uci_loop();
+    // uci_loop();
 
-
-
+    int score = evaluate();
+    printf("Avaliação da posição: %d\n", score);
 
     return 0;
 }
