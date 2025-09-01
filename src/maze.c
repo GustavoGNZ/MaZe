@@ -24,19 +24,11 @@ int main()
     runEngine();
     parseFEN(posicaoInicial);
     printTabuleiro();
-    
-    printf("\n=== PROFUNDIDADE 1 ===\n");
-    busca_lance(1);
-    printf("\n--- Verificando estado após profundidade 1 ---\n");
-    printTabuleiro();
-    printf("\n=== PROFUNDIDADE 2 ===\n");  
-    busca_lance(2);
-    printf("\n--- Verificando estado após profundidade 2 ---\n");
-    printTabuleiro();
-    printf("Score atual: %d\n", evaluate());
 
-    printf("\n=== PROFUNDIDADE 3 ===\n");
-    busca_lance(3);
+    printf("\n=== PROFUNDIDADE 8 ===\n");
+    busca_lance(5);
+    printf("\n--- Verificando estado após profundidade 8 ---\n");
+    printTabuleiro();
 
     // printTabuleiro();
     // lances listaLances[1];

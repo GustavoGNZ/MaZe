@@ -16,8 +16,7 @@ extern int king_table_eg[64];
 
 
 // Funções de avaliação específicas
-int evaluate_material();
-int evaluate_piece_position();
+
 
 // Função principal de avaliação
 int evaluate();

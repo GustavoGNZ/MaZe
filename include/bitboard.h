@@ -69,6 +69,8 @@ enum { a1, b1, c1, d1, e1, f1, g1, h1,
        a7, b7, c7, d7, e7, f7, g7, h7,
        a8, b8, c8, d8, e8, f8, g8, h8 };
 
+
+
 enum { branco, preto, ambos }; // lados
 enum { peao, cavalo, bispo, torre, dama, rei }; // lidar com pecas em alto nivel (nao sao as pecas do bitboard)
 
@@ -158,5 +160,9 @@ typedef struct {
     roque = (backup).roque_backup; \
 } while(0)
 
+// Macro para espelhar casa (converter perspectiva branca/preta)
+// Usa XOR com 56 para espelhar: a1(0) <-> a8(56), b1(1) <-> b8(57), etc.
+#define ESPELHAR_CASA(casa) ((casa) ^ 56)
 
 #endif
+

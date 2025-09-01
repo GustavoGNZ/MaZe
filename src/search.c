@@ -15,25 +15,24 @@ int negamax(int alpha, int beta, int depth)
     }
 
     nos++;
-    int bestMove_temporario;
-    int alpha_antigo = alpha;
     lances listaLances[1];
-
     gerar_lances(listaLances);
 
     for (int i = 0; i < listaLances->contador; i++)
     {
-        SALVAR_ESTADO(backup_global);
+        estado_jogo backup_local;  // Backup local para cada lance
+        SALVAR_ESTADO(backup_local);
         ply++;
 
-        if (fazer_lance(listaLances->lances[i], todosLances, backup_global) == 0)
+        if (fazer_lance(listaLances->lances[i], todosLances, backup_local) == 0)
         {
             ply--;
             continue;
         }
 
         int score = -negamax(-beta, -alpha, depth - 1);
-        RESTAURAR_ESTADO(backup_global);
+        
+        RESTAURAR_ESTADO(backup_local);  // Restaurar do backup local
         ply--;
 
         if (score >= beta)
@@ -46,14 +45,9 @@ int negamax(int alpha, int beta, int depth)
             alpha = score;
             if (ply == 0)
             {
-                bestMove_temporario = listaLances->lances[i];
+                bestMove = listaLances->lances[i];
             }
         }
-    }
-    if (alpha_antigo != alpha)
-    {
-        // Atualiza a melhor jogada
-        bestMove = bestMove_temporario;
     }
 
     return alpha;
@@ -63,6 +57,7 @@ void busca_lance(int depth){
     printf("Iniciando busca com profundidade %d\n", depth);
     printf("Posicao inicial: score = %d\n", evaluate());
     
+    ply = 0;  // Reset do ply
     int score = negamax(-99999, 99999, depth);
 
     printf("Melhor score: %d\n", score);
