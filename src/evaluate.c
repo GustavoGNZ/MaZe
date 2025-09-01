@@ -137,7 +137,7 @@ int evaluate() {
     // total_score += evaluate_king_safety();
     // total_score += evaluate_piece_coordination();
 
-    return total_score;
+    return (lado_a_jogar == branco) ? total_score : -total_score;
 }
 
 /**

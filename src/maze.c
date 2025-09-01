@@ -22,7 +22,21 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    parseFEN(posicaoInicial);
+    printTabuleiro();
+    
+    printf("\n=== PROFUNDIDADE 1 ===\n");
+    busca_lance(1);
+    printf("\n--- Verificando estado após profundidade 1 ---\n");
+    printTabuleiro();
+    printf("\n=== PROFUNDIDADE 2 ===\n");  
+    busca_lance(2);
+    printf("\n--- Verificando estado após profundidade 2 ---\n");
+    printTabuleiro();
+    printf("Score atual: %d\n", evaluate());
+
+    printf("\n=== PROFUNDIDADE 3 ===\n");
+    busca_lance(3);
 
     // printTabuleiro();
     // lances listaLances[1];
@@ -32,8 +46,6 @@ int main()
 
     // uci_loop();
 
-    int score = evaluate();
-    printf("Avaliação da posição: %d\n", score);
 
     return 0;
 }
