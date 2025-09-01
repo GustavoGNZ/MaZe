@@ -22,21 +22,15 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(posicaoInicial);
-    printTabuleiro();
-
-    printf("\n=== PROFUNDIDADE 8 ===\n");
-    busca_lance(5);
-    printf("\n--- Verificando estado após profundidade 8 ---\n");
-    printTabuleiro();
-
+    // parseFEN("k3r3/5r2/8/8/8/8/8/7K w - - 3 1");
+    // busca_lance(5);
     // printTabuleiro();
     // lances listaLances[1];
 
     // gerar_lances(listaLances);
     // printListaLances(listaLances);
 
-    // uci_loop();
+    uci_loop();
 
 
     return 0;

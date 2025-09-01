@@ -170,8 +170,7 @@ void parse_go(char *string_go)
         profundidade = 5; // valor padrão
     }
 
-    // buscar melhor lance
-    // chamada funcao
+    busca_lance(profundidade);
 
     
 
