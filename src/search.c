@@ -7,73 +7,25 @@
 int ply;
 int bestMove;
 
-// The purpose of this search is to only evaluate "quiet" positions, or positions where there are no winning tactical moves to be made. This search is needed to avoid the horizon effect. -- chess programing .org
-int quiescence(int alpha, int beta)
-{
-    int evaluation = evaluate();
-
-    if (evaluation >= beta)
-    {
-        return beta; 
-    }
-
-    if (evaluation > alpha)
-    {
-        alpha = evaluation;
-    }
-
-    lances listaLances[1];
-    gerar_lances(listaLances);
-
-    for (int i = 0; i < listaLances->contador; i++)
-    {
-        estado_jogo backup_local; // Backup local para cada lance
-        SALVAR_ESTADO(backup_local);
-        ply++;
-
-        if (fazer_lance(listaLances->lances[i], lancesCaptura, backup_local) == 0)
-        {
-            ply--;
-            continue;
-        }
-
-        int score = -quiescence(-beta, -alpha);
-
-        RESTAURAR_ESTADO(backup_local); // Restaurar do backup local
-        ply--;
-
-        if (score >= beta)
-        {
-            return beta; // Poda beta
-        }
-
-        if (score > alpha)
-        {
-            alpha = score;
-        }
-    }
-    return alpha;
-}
+// TODO tabela mvv-lva
 
 // variante minimax
 int negamax(int alpha, int beta, int depth)
 {
     if (depth == 0)
     {
-        return quiescence(alpha, beta);
+        return evaluate();
     }
 
     nos++;
-
-    int lances_legais = 0;
+    lances listaLances[1];
+    gerar_lances(listaLances);
 
     int em_cheque = casaEstaAtacada((lado_a_jogar == branco) ? getLeastBitIndex(bitboards[K]) : getLeastBitIndex(bitboards[k]), lado_a_jogar ^ 1);
 
+    int lances_legais = 0;
     int bestMove_temporario = 0;
     int alpha_antigo = alpha;
-
-    lances listaLances[1];
-    gerar_lances(listaLances);
 
     for (int i = 0; i < listaLances->contador; i++)
     {
