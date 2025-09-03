@@ -11,7 +11,7 @@
 #define posicaoVazia "8/8/8/8/8/8/8/8 w - - 0 1"
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 #define posicaoTeste "r3k2r/pPppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "
-#define RUYLOPEZ "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3"
+#define RUYLOPEZ "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 3 3"
 
 // FENs para testar en passant
 #define enPassantBranco "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
@@ -22,16 +22,19 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    // parseFEN("k3r3/5r2/8/8/8/8/8/7K w - - 3 1");
-    // busca_lance(5);
-    // printTabuleiro();
-    // lances listaLances[1];
+    parseFEN(posicaoTeste);
+    printTabuleiro();
+    busca_lance(6);
 
-    // gerar_lances(listaLances);
-    // printListaLances(listaLances);
+    lances listaLances[1];
+    gerar_lances(listaLances);
+    printListaLances(listaLances);
 
-    uci_loop();
+    sort_moves(listaLances);
+    print_move_scores();
+    printListaLances(listaLances);
 
+    // uci_loop();
 
     return 0;
 }
