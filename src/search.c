@@ -7,6 +7,9 @@
 int ply;
 int bestMove;
 
+int killer_moves[2][64];
+int history_moves[12][64];
+
 /**
  * TABELA MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
  *
@@ -197,6 +200,11 @@ int negamax(int alpha, int beta, int depth)
 
         if (score >= beta)
         {
+            // Atualizar killer moves
+            killer_moves[1][ply] = killer_moves[0][ply];
+            killer_moves[0][ply] = listaLances->lances[i];
+
+
             return beta; // Poda beta
         }
 
@@ -269,14 +277,15 @@ int score_move(int move)
 {
     int capturada = get_captura(move);
     int promocao = get_peca_promovida(move);
+    int destino = get_destino(move);
+    int atacante = get_peca(move);
+
     int base_score = 0;
 
     // Primeiro, calcular score da captura (se houver)
     if (capturada)
     {
         // É uma captura, vamos encontrar qual peça foi capturada
-        int destino = get_destino(move);
-        int atacante = get_peca(move);
         int pecaCapturada = 12; // Valor inválido por padrão
 
         // Determinar qual peça está sendo capturada no destino
@@ -304,47 +313,27 @@ int score_move(int move)
             }
         }
 
-        // Se encontrou a peça capturada, usa score MVV-LVA
-        if (pecaCapturada != 12)
+        return get_mvv_lva_score(atacante, pecaCapturada);
+    }
+    else
+    {
+        // killer moves e history moves
+
+        if (killer_moves[0][ply] == move)
         {
-            base_score = get_mvv_lva_score(atacante, pecaCapturada);
+            return 90;  // Entre as piores capturas (1-9) e melhores capturas (21-1000)
+        }
+        else if (killer_moves[1][ply] == move)
+        {
+            return 80;  // Segundo killer move com score menor
         }
         else
         {
-            base_score = 1; // Captura mas não encontrou a peça (erro)
+            return history_moves[atacante][destino];
         }
     }
 
-    // // Segundo, adicionar bonus de promoção (se houver)
-    // if (promocao)
-    // {
-    //     if (capturada) {
-    //         // Promoção com captura: bonus pequeno (só para desempate)
-    //         switch (promocao)
-    //         {
-    //             case Q: // Dama
-    //             case q:
-    //                 base_score += 4; // Maior bonus para desempate
-    //                 break;
-    //             case R: // Torre
-    //             case r:
-    //                 base_score += 3;
-    //                 break;
-    //             case B: // Bispo
-    //             case b:
-    //                 base_score += 2;
-    //                 break;
-    //             case N: // Cavalo
-    //             case n:
-    //                 base_score += 1; // Menor bonus (às vezes cavalo é melhor)
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //     }
-    // }
-
-    return base_score;
+    return 0;
 }
 
 void print_move_scores()
