@@ -14,6 +14,20 @@ int history_moves[12][MAX_PLY];
 int pv_length[MAX_PLY];
 int pv_table[MAX_PLY][MAX_PLY];
 
+int follow_pv, score_pv;
+
+void enable_pv_scoring(lances *listaLances) {
+    follow_pv = 0;
+
+    for(int i = 0; i < listaLances->contador; i++) {
+        if(pv_table[0][ply] == listaLances->lances[i]) {
+            follow_pv = 1;
+            score_pv = 1;
+            break;
+        }
+    }
+}
+
 /*
 TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
 
@@ -196,6 +210,11 @@ int quiescence(int alpha, int beta)
 // variante minimax
 int negamax(int alpha, int beta, int depth)
 {
+
+    int found_pv;
+
+    int score;
+
     pv_length[ply] = ply;
 
     if (depth == 0)
@@ -219,8 +238,14 @@ int negamax(int alpha, int beta, int depth)
 
     int lances_legais = 0;
 
+
+
     lances listaLances[1];
     gerar_lances(listaLances);
+
+    if(follow_pv){
+        enable_pv_scoring(listaLances);
+    }
 
     sort_moves(listaLances);
 
@@ -238,7 +263,15 @@ int negamax(int alpha, int beta, int depth)
 
         lances_legais++;
 
-        int score = -negamax(-beta, -alpha, depth - 1);
+        if(found_pv){
+            score = -negamax(-alpha - 1, -alpha, depth - 1);
+
+            if((score > alpha) && (score < beta)){
+                score = -negamax(-beta, -alpha, depth - 1); // Re-search
+            }
+        } else {
+            score = -negamax(-beta, -alpha, depth - 1);
+        }
 
         RESTAURAR_ESTADO(backup_local); // Restaurar do backup local
         ply--;
@@ -264,6 +297,9 @@ int negamax(int alpha, int beta, int depth)
 
             alpha = score;
 
+            found_pv = 1;
+
+            // Atualizar a tabela PV
             pv_table[ply][ply] = listaLances->lances[i];
 
             for (int next_ply = ply + 1; next_ply < pv_length[ply + 1]; next_ply++)
@@ -293,6 +329,8 @@ void busca_lance(int depth)
 {
     int score;
     nos = 0;
+    follow_pv = 0;
+    score_pv = 0;
 
     memset(killer_moves, 0, sizeof(killer_moves));
     memset(history_moves, 0, sizeof(history_moves));
@@ -309,6 +347,7 @@ void busca_lance(int depth)
     for (int i = 1; i <= depth; i++)
     {
 
+        follow_pv = 1;
         score = negamax(-99999, 99999, i);
 
         printf("info score cp %d depth %d nodes %ld pv ", score, i, nos);
@@ -326,54 +365,10 @@ void busca_lance(int depth)
 
     printf("bestmove ");
     printLance(pv_table[0][0]); // é o melhor lance da linha principal
-
-    // Detectar e reportar mate
-    if (score >= 99990)
-    {
-        int mate_in = (99999 - score) / 2 + 1;
-    }
-    else if (score <= -99990)
-    {
-        int mate_in = (99999 + score) / 2 + 1;
-    }
-
-    printf("\n");
-
-    nos = 0;
-
-    memset(killer_moves, 0, sizeof(killer_moves));
-    memset(history_moves, 0, sizeof(history_moves));
-    memset(pv_length, 0, sizeof(pv_length));
-    memset(pv_table, 0, sizeof(pv_table));
-
-    nos = 0; // Reset contador de nós
-    score = negamax(-99999, 99999, depth);
-
-    printf("info score cp %d depth %d nodes %ld pv ", score, depth, nos);
-
-    for (int i = 0; i < pv_length[0]; i++)
-    {
-        printLance(pv_table[0][i]);
-        printf(" ");
-    }
-
-    printf("\n");
-
-    printf("bestmove ");
-    printLance(pv_table[0][0]); // é o melhor lance da linha principal
-
-    // Detectar e reportar mate
-    if (score >= 99990)
-    {
-        int mate_in = (99999 - score) / 2 + 1;
-    }
-    else if (score <= -99990)
-    {
-        int mate_in = (99999 + score) / 2 + 1;
-    }
-
     printf("\n");
 }
+
+
 
 int score_move(int move)
 {
@@ -383,6 +378,14 @@ int score_move(int move)
     int atacante = get_peca(move);
 
     int base_score = 0;
+
+    if(score_pv){
+        if(pv_table[0][ply] == move){
+
+            score_pv = 0;
+            return 10000; // Melhor lance da linha principal
+        }
+    }
 
     // Primeiro, calcular score da captura (se houver)
     if (capturada)

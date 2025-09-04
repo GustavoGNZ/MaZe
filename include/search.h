@@ -12,6 +12,7 @@ extern int mvv_lva[12][12];
 extern int killer_moves[2][64];
 extern int history_moves[12][64];
 
+void enable_pv_scoring(lances *listaLances);
 int quiescence(int alpha, int beta);
 int negamax(int alpha, int beta, int depth);
 void busca_lance(int depth);

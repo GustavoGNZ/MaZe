@@ -23,9 +23,9 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(posicaoTeste);
+    parseFEN(posicaoInicial);
     printTabuleiro();
-    busca_lance(5);
+    busca_lance(8);
 
     lances listaLances[1];
     gerar_lances(listaLances);
