@@ -5,10 +5,50 @@
 #include "../include/ataques.h"
 
 int ply;
-int bestMove;
 
-int killer_moves[2][64];
-int history_moves[12][64];
+#define MAX_PLY 64
+
+int killer_moves[2][MAX_PLY];
+int history_moves[12][MAX_PLY];
+
+int pv_length[MAX_PLY];
+int pv_table[MAX_PLY][MAX_PLY];
+
+/*
+TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
+
+A tabela triangular da variação principal é uma estrutura de dados usada em motores de xadrez
+para armazenar e recuperar a melhor sequência de lances encontrada durante a busca.
+
+ESTRUTURA:
+- É chamada "triangular" porque cada nível da busca armazena menos lances que o anterior
+- No ply 0 (raiz): armazena toda a variação principal
+- No ply 1: armazena a variação principal menos o primeiro lance
+- No ply 2: armazena a variação principal menos os dois primeiros lances
+- E assim por diante...
+
+EXEMPLO DE ESTRUTURA:
+pv_table[ply][ply_index] onde:
+- ply: profundidade atual da busca (0 = raiz)
+- ply_index: índice do lance na variação principal
+
+ply 0: [e4, e5, Nf3, Nc6, Bb5, a6]  <- Variação completa
+ply 1:     [e5, Nf3, Nc6, Bb5, a6]  <- Sem o primeiro lance
+ply 2:         [Nf3, Nc6, Bb5, a6]  <- Sem os dois primeiros
+ply 3:              [Nc6, Bb5, a6]  <- E assim por diante...
+
+COMO FUNCIONA:
+1. Quando encontramos um novo melhor lance, atualizamos a PV table
+2. Copiamos a variação do nível filho e adicionamos o lance atual no início
+3. O comprimento da variação diminui conforme descemos na árvore
+
+VANTAGENS:
+- Permite mostrar a melhor linha de jogo encontrada
+- Útil para debugging e análise
+- Melhora a ordenação de lances em buscas subsequentes
+- Implementação eficiente em memória
+
+*/
 
 /**
  * TABELA MVV-LVA (Most Valuable Victim - Least Valuable Attacker)
@@ -156,6 +196,8 @@ int quiescence(int alpha, int beta)
 // variante minimax
 int negamax(int alpha, int beta, int depth)
 {
+    pv_length[ply] = ply;
+
     if (depth == 0)
     {
         return quiescence(alpha, beta);
@@ -171,8 +213,6 @@ int negamax(int alpha, int beta, int depth)
     }
 
     int lances_legais = 0;
-    int bestMove_temporario = 0;
-    int alpha_antigo = alpha;
 
     lances listaLances[1];
     gerar_lances(listaLances);
@@ -200,21 +240,32 @@ int negamax(int alpha, int beta, int depth)
 
         if (score >= beta)
         {
-            // Atualizar killer moves
-            killer_moves[1][ply] = killer_moves[0][ply];
-            killer_moves[0][ply] = listaLances->lances[i];
-
+            if (get_captura(listaLances->lances[i]))
+            {
+                // Atualizar killer moves
+                killer_moves[1][ply] = killer_moves[0][ply];
+                killer_moves[0][ply] = listaLances->lances[i];
+            }
 
             return beta; // Poda beta
         }
 
         if (score > alpha)
         {
-            alpha = score;
-            if (ply == 0)
+            if (get_captura(listaLances->lances[i]))
             {
-                bestMove_temporario = listaLances->lances[i];
+                history_moves[get_peca(listaLances->lances[i])][get_destino(listaLances->lances[i])] += 1;
             }
+
+            alpha = score;
+
+            pv_table[ply][ply] = listaLances->lances[i];
+
+            for (int next_ply = ply + 1; next_ply < pv_length[ply + 1]; next_ply++)
+            {
+                pv_table[ply][next_ply] = pv_table[ply + 1][next_ply];
+            }
+            pv_length[ply] = pv_length[ply + 1];
         }
     }
 
@@ -228,11 +279,6 @@ int negamax(int alpha, int beta, int depth)
         {
             return 0; // empate por afogamento
         }
-    }
-
-    if (alpha_antigo != alpha)
-    {
-        bestMove = bestMove_temporario;
     }
 
     return alpha;
@@ -249,28 +295,28 @@ void busca_lance(int depth)
     nos = 0; // Reset contador de nós
     int score = negamax(-99999, 99999, depth);
 
-    if (bestMove)
-    {
-        printf("info score cp %d depth %d nodes %ld\n", score, depth, nos);
-        printf("bestmove ");
-        printLance(bestMove);
+    printf("info score cp %d depth %d nodes %ld pv \n", score, depth, nos);
 
-        // Detectar e reportar mate
-        if (score >= 99990)
-        {
-            int mate_in = (99999 - score) / 2 + 1;
-        }
-        else if (score <= -99990)
-        {
-            int mate_in = (99999 + score) / 2 + 1;
-        }
-
-        printf("\n");
-    }
-    else
+    for (int i = 0; i < pv_length[ply]; i++)
     {
-        printf("Nenhum lance encontrado!\n");
+        printLance(pv_table[0][i]);
+        printf(" ");
     }
+
+    printf("bestmove ");
+    printLance(pv_table[0][0]); // é o melhor lance da linha principal
+
+    // Detectar e reportar mate
+    if (score >= 99990)
+    {
+        int mate_in = (99999 - score) / 2 + 1;
+    }
+    else if (score <= -99990)
+    {
+        int mate_in = (99999 + score) / 2 + 1;
+    }
+
+    printf("\n");
 }
 
 int score_move(int move)
@@ -321,11 +367,11 @@ int score_move(int move)
 
         if (killer_moves[0][ply] == move)
         {
-            return 90;  // Entre as piores capturas (1-9) e melhores capturas (21-1000)
+            return 90; // Entre as piores capturas (1-9) e melhores capturas (21-1000)
         }
         else if (killer_moves[1][ply] == move)
         {
-            return 80;  // Segundo killer move com score menor
+            return 80; // Segundo killer move com score menor
         }
         else
         {
