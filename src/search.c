@@ -203,6 +203,11 @@ int negamax(int alpha, int beta, int depth)
         return quiescence(alpha, beta);
     }
 
+    if (ply > MAX_PLY - 1)
+    {
+        return evaluate();
+    }
+
     nos++;
 
     int em_cheque = casaEstaAtacada((lado_a_jogar == branco) ? getLeastBitIndex(bitboards[K]) : getLeastBitIndex(bitboards[k]), lado_a_jogar ^ 1);
@@ -286,22 +291,73 @@ int negamax(int alpha, int beta, int depth)
 
 void busca_lance(int depth)
 {
+    int score;
+    nos = 0;
+
+    memset(killer_moves, 0, sizeof(killer_moves));
+    memset(history_moves, 0, sizeof(history_moves));
+    memset(pv_length, 0, sizeof(pv_length));
+    memset(pv_table, 0, sizeof(pv_table));
+
     // Para detectar mate em 1, precisa de pelo menos profundidade 2
     if (depth < 2)
     {
         depth = 2;
     }
 
+    // Iterative deepening
+    for (int i = 1; i <= depth; i++)
+    {
+
+        score = negamax(-99999, 99999, i);
+
+        printf("info score cp %d depth %d nodes %ld pv ", score, i, nos);
+
+        for (int j = 0; j < pv_length[0]; j++)
+        {
+            printLance(pv_table[0][j]);
+            printf(" ");
+        }
+
+        printf("\n");
+    }
+
+    printf("\n");
+
+    printf("bestmove ");
+    printLance(pv_table[0][0]); // é o melhor lance da linha principal
+
+    // Detectar e reportar mate
+    if (score >= 99990)
+    {
+        int mate_in = (99999 - score) / 2 + 1;
+    }
+    else if (score <= -99990)
+    {
+        int mate_in = (99999 + score) / 2 + 1;
+    }
+
+    printf("\n");
+
+    nos = 0;
+
+    memset(killer_moves, 0, sizeof(killer_moves));
+    memset(history_moves, 0, sizeof(history_moves));
+    memset(pv_length, 0, sizeof(pv_length));
+    memset(pv_table, 0, sizeof(pv_table));
+
     nos = 0; // Reset contador de nós
-    int score = negamax(-99999, 99999, depth);
+    score = negamax(-99999, 99999, depth);
 
-    printf("info score cp %d depth %d nodes %ld pv \n", score, depth, nos);
+    printf("info score cp %d depth %d nodes %ld pv ", score, depth, nos);
 
-    for (int i = 0; i < pv_length[ply]; i++)
+    for (int i = 0; i < pv_length[0]; i++)
     {
         printLance(pv_table[0][i]);
         printf(" ");
     }
+
+    printf("\n");
 
     printf("bestmove ");
     printLance(pv_table[0][0]); // é o melhor lance da linha principal

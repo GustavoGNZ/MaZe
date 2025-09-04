@@ -31,7 +31,7 @@ int main()
     gerar_lances(listaLances);
     // printListaLances(listaLances); // ruim no windows
     sort_moves(listaLances);
-    print_move_scores();
+    // print_move_scores();
     // printListaLances(listaLances);
 
     // uci_loop();
