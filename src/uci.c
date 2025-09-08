@@ -167,7 +167,7 @@ void parse_go(char *string_go)
     }
     else
     {
-        profundidade = 7; // valor padrão
+        profundidade = 6; // valor padrão
     }
 
     busca_lance(profundidade);
