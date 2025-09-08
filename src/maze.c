@@ -19,17 +19,19 @@
 #define enPassantPreto "rnbqkbnr/pppp1ppp/8/8/3Pp3/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 3"
 #define repeticao "2r3k1/R7/8/1R6/8/8/P4KPP/8 w - - 0 40"
 #define peaoDobrado "8/8/1p6/8/P7/P7/P7/8 w - - 0 1"
+#define testeSegurancaRei "rn1qkbnr/ppp2ppp/4p3/1b1p4/6B1/5N2/PP3PPP/RNBQK2R w kq - 0 1"
 
 int main()
 {
     u64 tabuleiro = 0ULL;
 
     runEngine();
+    
     // lances listaLances[1];
     // gerar_lances(listaLances);
     // sort_moves(listaLances);
 
-    // uci_loop();
+    uci_loop();
 
     return 0;
 }

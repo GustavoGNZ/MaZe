@@ -1,5 +1,7 @@
 #include "../include/evaluate.h"
 #include "../include/globals.h"
+#include "../include/bitboard.h"
+#include "../include/ataques.h"
 
 int material_score[12] = {
     100, 320, 330, 500, 900, 20000,      // P, N, B, R, Q, K
@@ -17,6 +19,18 @@ int coluna_semilivre_bonus = 6;
 int coluna_livre_bonus = 12;
 int rei_coluna_livre_penalidade = 20;      // Penalidade por rei em coluna livre
 int rei_coluna_semilivre_penalidade = 12;  // Penalidade por rei em coluna semi-livre
+
+// Parâmetros de mobilidade (bônus por movimento legal)
+int mobility_bonus_knight = 4;   // Bônus por movimento de cavalo
+int mobility_bonus_bishop = 5;   // Bônus por movimento de bispo
+int mobility_bonus_rook = 2;     // Bônus por movimento de torre
+int mobility_bonus_queen = 1;    // Bônus por movimento de dama
+
+// Parâmetros de segurança do rei
+int king_safety_pawn_shield_bonus = 10;    // Bônus por peão protetor
+int king_safety_open_file_penalty = 15;    // Penalidade por linha/coluna aberta perto do rei
+int king_safety_attacked_square_penalty = 20;  // Penalidade por casa atacada ao redor do rei
+int king_safety_king_attacked_penalty = 50;    // Penalidade por rei diretamente atacado
 // Array para converter índice de casa (0-63) para número da fileira (0-7)
 // ====================================================================
 // Sistema de coordenadas do tabuleiro:
@@ -694,6 +708,378 @@ int evaluate_open_files()
     return score;
 }
 
+int evaluate_king_safety()
+{
+    int score = 0;
+    
+    // Obter bitboards dos peões
+    u64 peoes_brancos = bitboards[P];
+    u64 peoes_pretos = bitboards[p];
+
+    // =========================================================================
+    // SEGURANÇA DO REI BRANCO
+    // =========================================================================
+    
+    u64 rei_branco = bitboards[K];
+    if (rei_branco)
+    {
+        int casa_rei = getLeastBitIndex(rei_branco);
+        int linha_rei = casa_rei / 8;
+        int coluna_rei = casa_rei % 8;
+        
+        // AVALIAR ESCUDO DE PEÕES
+        // Verificar peões nas casas ao redor do rei (principalmente à frente)
+        int peoes_protetores = 0;
+        
+        // Casas à frente do rei (linha + 1)
+        if (linha_rei < 7)
+        {
+            for (int col_offset = -1; col_offset <= 1; col_offset++)
+            {
+                int col_check = coluna_rei + col_offset;
+                if (col_check >= 0 && col_check < 8)
+                {
+                    int casa_check = (linha_rei + 1) * 8 + col_check;
+                    if (getBit(peoes_brancos, casa_check))
+                    {
+                        peoes_protetores++;
+                    }
+                }
+            }
+        }
+        
+        score += peoes_protetores * king_safety_pawn_shield_bonus;
+        
+        // AVALIAR ATAQUES AO REI E CASAS ADJACENTES
+        // Verificar se o rei está sendo atacado
+        if (casaEstaAtacada(casa_rei, preto))
+        {
+            score -= king_safety_king_attacked_penalty;
+        }
+        
+        // Verificar casas ao redor do rei (zona de segurança)
+        int casas_atacadas = 0;
+        for (int linha_offset = -1; linha_offset <= 1; linha_offset++)
+        {
+            for (int col_offset = -1; col_offset <= 1; col_offset++)
+            {
+                if (linha_offset == 0 && col_offset == 0) continue; // Pular a casa do próprio rei
+                
+                int linha_check = linha_rei + linha_offset;
+                int col_check = coluna_rei + col_offset;
+                
+                if (linha_check >= 0 && linha_check < 8 && col_check >= 0 && col_check < 8)
+                {
+                    int casa_check = linha_check * 8 + col_check;
+                    if (casaEstaAtacada(casa_check, preto))
+                    {
+                        casas_atacadas++;
+                    }
+                }
+            }
+        }
+        score -= casas_atacadas * king_safety_attacked_square_penalty;
+        
+        // AVALIAR EXPOSIÇÃO A COLUNAS/LINHAS ABERTAS
+        u64 mascara_coluna_rei = coluna_masks[casa_rei];
+        
+        // Penalidade se o rei está em coluna sem peões próprios
+        if (!(peoes_brancos & mascara_coluna_rei))
+        {
+            score -= king_safety_open_file_penalty;
+        }
+        
+        // Verificar colunas adjacentes também
+        if (coluna_rei > 0)
+        {
+            u64 mascara_coluna_esquerda = coluna_masks[casa_rei - 1];
+            if (!(peoes_brancos & mascara_coluna_esquerda))
+            {
+                score -= king_safety_open_file_penalty / 2;
+            }
+        }
+        
+        if (coluna_rei < 7)
+        {
+            u64 mascara_coluna_direita = coluna_masks[casa_rei + 1];
+            if (!(peoes_brancos & mascara_coluna_direita))
+            {
+                score -= king_safety_open_file_penalty / 2;
+            }
+        }
+    }
+
+    // =========================================================================
+    // SEGURANÇA DO REI PRETO
+    // =========================================================================
+    
+    u64 rei_preto = bitboards[k];
+    if (rei_preto)
+    {
+        int casa_rei = getLeastBitIndex(rei_preto);
+        int linha_rei = casa_rei / 8;
+        int coluna_rei = casa_rei % 8;
+        
+        // AVALIAR ESCUDO DE PEÕES
+        // Para pretas, verificar peões nas casas à frente (linha - 1)
+        int peoes_protetores = 0;
+        
+        if (linha_rei > 0)
+        {
+            for (int col_offset = -1; col_offset <= 1; col_offset++)
+            {
+                int col_check = coluna_rei + col_offset;
+                if (col_check >= 0 && col_check < 8)
+                {
+                    int casa_check = (linha_rei - 1) * 8 + col_check;
+                    if (getBit(peoes_pretos, casa_check))
+                    {
+                        peoes_protetores++;
+                    }
+                }
+            }
+        }
+        
+        score -= peoes_protetores * king_safety_pawn_shield_bonus;
+        
+        // AVALIAR ATAQUES AO REI E CASAS ADJACENTES
+        // Verificar se o rei está sendo atacado
+        if (casaEstaAtacada(casa_rei, branco))
+        {
+            score += king_safety_king_attacked_penalty;
+        }
+        
+        // Verificar casas ao redor do rei (zona de segurança)
+        int casas_atacadas = 0;
+        for (int linha_offset = -1; linha_offset <= 1; linha_offset++)
+        {
+            for (int col_offset = -1; col_offset <= 1; col_offset++)
+            {
+                if (linha_offset == 0 && col_offset == 0) continue; // Pular a casa do próprio rei
+                
+                int linha_check = linha_rei + linha_offset;
+                int col_check = coluna_rei + col_offset;
+                
+                if (linha_check >= 0 && linha_check < 8 && col_check >= 0 && col_check < 8)
+                {
+                    int casa_check = linha_check * 8 + col_check;
+                    if (casaEstaAtacada(casa_check, branco))
+                    {
+                        casas_atacadas++;
+                    }
+                }
+            }
+        }
+        score += casas_atacadas * king_safety_attacked_square_penalty;
+        
+        // AVALIAR EXPOSIÇÃO A COLUNAS/LINHAS ABERTAS
+        u64 mascara_coluna_rei = coluna_masks[casa_rei];
+        
+        // Penalidade se o rei está em coluna sem peões próprios
+        if (!(peoes_pretos & mascara_coluna_rei))
+        {
+            score += king_safety_open_file_penalty;
+        }
+        
+        // Verificar colunas adjacentes também
+        if (coluna_rei > 0)
+        {
+            u64 mascara_coluna_esquerda = coluna_masks[casa_rei - 1];
+            if (!(peoes_pretos & mascara_coluna_esquerda))
+            {
+                score += king_safety_open_file_penalty / 2;
+            }
+        }
+        
+        if (coluna_rei < 7)
+        {
+            u64 mascara_coluna_direita = coluna_masks[casa_rei + 1];
+            if (!(peoes_pretos & mascara_coluna_direita))
+            {
+                score += king_safety_open_file_penalty / 2;
+            }
+        }
+    }
+
+    return score;
+}
+
+int evaluate_mobility()
+{
+    int score = 0;
+    u64 ocupacao_total = 0ULL;
+
+    // Calcular bitboard de ocupação total (todas as peças)
+    for (int peca = P; peca <= k; peca++)
+    {
+        ocupacao_total |= bitboards[peca];
+    }
+
+    // =========================================================================
+    // MOBILIDADE DOS CAVALOS
+    // =========================================================================
+    
+    // Cavalos brancos
+    u64 cavalos_brancos = bitboards[N];
+    while (cavalos_brancos)
+    {
+        int casa = getLeastBitIndex(cavalos_brancos);
+        u64 ataques = gerarAtaquesCavalo(casa);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_brancas = bitboards[P] | bitboards[N] | bitboards[B] | bitboards[R] | bitboards[Q] | bitboards[K];
+        ataques &= ~pecas_brancas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score += movimentos * mobility_bonus_knight;
+        
+        clearBit(cavalos_brancos, casa);
+    }
+
+    // Cavalos pretos
+    u64 cavalos_pretos = bitboards[n];
+    while (cavalos_pretos)
+    {
+        int casa = getLeastBitIndex(cavalos_pretos);
+        u64 ataques = gerarAtaquesCavalo(casa);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_pretas = bitboards[p] | bitboards[n] | bitboards[b] | bitboards[r] | bitboards[q] | bitboards[k];
+        ataques &= ~pecas_pretas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score -= movimentos * mobility_bonus_knight;
+        
+        clearBit(cavalos_pretos, casa);
+    }
+
+    // =========================================================================
+    // MOBILIDADE DOS BISPOS
+    // =========================================================================
+    
+    // Bispos brancos
+    u64 bispos_brancos = bitboards[B];
+    while (bispos_brancos)
+    {
+        int casa = getLeastBitIndex(bispos_brancos);
+        u64 ataques = obterAtaquesBispo(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_brancas = bitboards[P] | bitboards[N] | bitboards[B] | bitboards[R] | bitboards[Q] | bitboards[K];
+        ataques &= ~pecas_brancas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score += movimentos * mobility_bonus_bishop;
+        
+        clearBit(bispos_brancos, casa);
+    }
+
+    // Bispos pretos
+    u64 bispos_pretos = bitboards[b];
+    while (bispos_pretos)
+    {
+        int casa = getLeastBitIndex(bispos_pretos);
+        u64 ataques = obterAtaquesBispo(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_pretas = bitboards[p] | bitboards[n] | bitboards[b] | bitboards[r] | bitboards[q] | bitboards[k];
+        ataques &= ~pecas_pretas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score -= movimentos * mobility_bonus_bishop;
+        
+        clearBit(bispos_pretos, casa);
+    }
+
+    // =========================================================================
+    // MOBILIDADE DAS TORRES
+    // =========================================================================
+    
+    // Torres brancas
+    u64 torres_brancas = bitboards[R];
+    while (torres_brancas)
+    {
+        int casa = getLeastBitIndex(torres_brancas);
+        u64 ataques = obterAtaquesTorre(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_brancas = bitboards[P] | bitboards[N] | bitboards[B] | bitboards[R] | bitboards[Q] | bitboards[K];
+        ataques &= ~pecas_brancas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score += movimentos * mobility_bonus_rook;
+        
+        clearBit(torres_brancas, casa);
+    }
+
+    // Torres pretas
+    u64 torres_pretas = bitboards[r];
+    while (torres_pretas)
+    {
+        int casa = getLeastBitIndex(torres_pretas);
+        u64 ataques = obterAtaquesTorre(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_pretas = bitboards[p] | bitboards[n] | bitboards[b] | bitboards[r] | bitboards[q] | bitboards[k];
+        ataques &= ~pecas_pretas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score -= movimentos * mobility_bonus_rook;
+        
+        clearBit(torres_pretas, casa);
+    }
+
+    // =========================================================================
+    // MOBILIDADE DAS DAMAS
+    // =========================================================================
+    
+    // Damas brancas
+    u64 damas_brancas = bitboards[Q];
+    while (damas_brancas)
+    {
+        int casa = getLeastBitIndex(damas_brancas);
+        u64 ataques = obterAtaquesDama(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_brancas = bitboards[P] | bitboards[N] | bitboards[B] | bitboards[R] | bitboards[Q] | bitboards[K];
+        ataques &= ~pecas_brancas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score += movimentos * mobility_bonus_queen;
+        
+        clearBit(damas_brancas, casa);
+    }
+
+    // Damas pretas
+    u64 damas_pretas = bitboards[q];
+    while (damas_pretas)
+    {
+        int casa = getLeastBitIndex(damas_pretas);
+        u64 ataques = obterAtaquesDama(casa, ocupacao_total);
+        
+        // Remover casas ocupadas por peças próprias
+        u64 pecas_pretas = bitboards[p] | bitboards[n] | bitboards[b] | bitboards[r] | bitboards[q] | bitboards[k];
+        ataques &= ~pecas_pretas;
+        
+        // Contar movimentos disponíveis
+        int movimentos = __builtin_popcountll(ataques);
+        score -= movimentos * mobility_bonus_queen;
+        
+        clearBit(damas_pretas, casa);
+    }
+
+    return score;
+}
+
+
+
 /**
  * @brief Função principal de avaliação da posição
  *
@@ -724,22 +1110,33 @@ int evaluate_open_files()
 int evaluate()
 {
     int score = 0;
+    int component_score;
 
     // Avaliação material
-    score += evaluate_material();
-    printf("Avaliação material: %d\n", score);
+    component_score = evaluate_material();
+    score += component_score;
 
     // Avaliação posicional
-    score += evaluate_positional();
-    printf("Avaliação posicional: %d\n", score);
+    component_score = evaluate_positional();
+    score += component_score;
 
     // Avaliação de estrutura de peões (dobrados, isolados, passados)
-    score += evaluate_pawn_structure();
-    printf("Avaliação estrutura de peões: %d\n", score);
+    component_score = evaluate_pawn_structure();
+    score += component_score;
 
     // Avaliação de colunas livres e semi-livres
-    score += evaluate_open_files();
-    printf("Avaliação colunas livres/semi-livres: %d\n", score);
+    component_score = evaluate_open_files();
+    score += component_score;
+
+    // Avaliação de mobilidade das peças
+    component_score = evaluate_mobility();
+    score += component_score;
+
+    // Avaliação de segurança do rei
+    component_score = evaluate_king_safety();
+    score += component_score;
+
+    
 
     // Retorna a avaliação do ponto de vista do lado a jogar
     return (lado_a_jogar == branco) ? score : -score;
