@@ -8,6 +8,22 @@ int ply;
 
 #define MAX_PLY 64
 
+// Array para detectar repetição na linha de busca atual
+u64 hash_linha_busca[MAX_PLY_BUSCA];
+
+// Função para detectar repetição na linha de busca atual
+int detectar_repeticao_busca() {
+    u64 hash_atual = hash_posicao_simples();
+    
+    // Verificar se esta posição já apareceu na linha de busca atual
+    for (int i = 0; i < ply; i++) {
+        if (hash_linha_busca[i] == hash_atual) {
+            return 1; // Repetição detectada
+        }
+    }
+    return 0; // Não é repetição
+}
+
 int killer_moves[2][MAX_PLY];
 int history_moves[12][MAX_PLY];
 
@@ -160,6 +176,8 @@ int get_mvv_lva_score(int atacante, int vitima)
 
 int quiescence(int alpha, int beta)
 {
+
+    
     int evaluation = evaluate();
 
     if (evaluation >= beta)
@@ -226,6 +244,14 @@ int negamax(int alpha, int beta, int depth)
     {
         return evaluate();
     }
+
+    // Detectar repetição na linha de busca
+    if (detectar_repeticao_busca()) {
+        return 0; // Empate por repetição
+    }
+
+    // Armazenar hash da posição atual na linha de busca
+    hash_linha_busca[ply] = hash_posicao_simples();
 
     nos++;
 
@@ -336,6 +362,7 @@ void busca_lance(int depth)
     memset(history_moves, 0, sizeof(history_moves));
     memset(pv_length, 0, sizeof(pv_length));
     memset(pv_table, 0, sizeof(pv_table));
+    memset(hash_linha_busca, 0, sizeof(hash_linha_busca));
 
     // Para detectar mate em 1, precisa de pelo menos profundidade 2
     if (depth < 2)

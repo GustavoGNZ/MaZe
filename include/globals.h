@@ -4,6 +4,17 @@
 
 #include "bitboard.h"
 
+// Estrutura para detecção de repetição
+#define MAX_HISTORIA 1000
+extern u64 historico_posicoes[MAX_HISTORIA];
+extern int contador_historia;
+
+// Funções para detecção de repetição
+void adicionar_posicao_historia();
+int posicao_repetida();
+void limpar_historia();
+u64 hash_posicao_simples();
+
 extern u64 tabela_ataques_peao[2][64];
 extern u64 tabela_ataques_cavalo[64];
 extern u64 tabela_ataques_rei[64];

@@ -3,6 +3,10 @@
 // Variável global para backup do estado do jogo
 estado_jogo backup_global;
 
+// Histórico de posições para detecção de repetição
+u64 historico_posicoes[MAX_HISTORIA];
+int contador_historia = 0;
+
 u64 tabela_ataques_peao[2][64];
 u64 tabela_ataques_cavalo[64];
 u64 tabela_ataques_rei[64];
@@ -169,6 +173,64 @@ u64 magics_torre[64] = {
     0x2006104900a0804ULL,
     0x1004081002402ULL,
 };
+
+// Função simples para gerar hash da posição
+u64 hash_posicao_simples() {
+    u64 hash = 0;
+    
+    // Hash baseado nos bitboards das peças
+    for (int i = 0; i < 12; i++) {
+        hash ^= bitboards[i];
+        hash = hash * 1103515245ULL + 12345ULL; // Multiplicador LCG simples
+    }
+    
+    // Incluir lado a jogar
+    if (lado_a_jogar == preto) {
+        hash ^= 0x123456789ABCDEFULL;
+    }
+    
+    // Incluir direitos de roque
+    hash ^= roque * 0x9E3779B97F4A7C15ULL;
+    
+    // Incluir en passant (se houver)
+    if (en_passant != -1) {  // Assumindo -1 como valor inválido
+        hash ^= en_passant * 0x517CC1B727220A95ULL;
+    }
+    
+    return hash;
+}
+
+// Adicionar posição atual ao histórico
+void adicionar_posicao_historia() {
+    if (contador_historia < MAX_HISTORIA) {
+        historico_posicoes[contador_historia] = hash_posicao_simples();
+        contador_historia++;
+    }
+}
+
+// Verificar se a posição atual já ocorreu antes
+int posicao_repetida() {
+    u64 hash_atual = hash_posicao_simples();
+    int contador = 0;
+    
+    for (int i = 0; i < contador_historia; i++) {
+        if (historico_posicoes[i] == hash_atual) {
+            contador++;
+            if (contador >= 2) { // Terceira ocorrência = repetição
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+// Limpar histórico
+void limpar_historia() {
+    contador_historia = 0;
+    for (int i = 0; i < MAX_HISTORIA; i++) {
+        historico_posicoes[i] = 0;
+    }
+}
 
 
 

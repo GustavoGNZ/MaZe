@@ -7,6 +7,10 @@
 extern int ply;
 extern int bestMove;
 
+// Array para detectar repetição na linha de busca atual
+#define MAX_PLY_BUSCA 64
+extern u64 hash_linha_busca[MAX_PLY_BUSCA];
+
 // Tabela MVV-LVA para ordenação de capturas
 extern int mvv_lva[12][12];
 extern int killer_moves[2][64];

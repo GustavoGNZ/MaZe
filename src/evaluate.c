@@ -1,4 +1,5 @@
 #include "../include/evaluate.h"
+#include "../include/globals.h"
 
 int material_score[12] = {
     100, 320, 330, 500, 900, 20000, // P, N, B, R, Q, K

@@ -17,13 +17,14 @@
 // FENs para testar en passant
 #define enPassantBranco "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
 #define enPassantPreto "rnbqkbnr/pppp1ppp/8/8/3Pp3/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 3"
+#define repeticao "2r3k1/R7/8/1R6/8/8/P4KPP/8 w - - 0 40"
 
 int main()
 {
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(posicaoInicial);
+    parseFEN(repeticao);
     printTabuleiro();
     busca_lance(8);
 
