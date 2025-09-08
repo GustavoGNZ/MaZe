@@ -41,24 +41,27 @@ int get_linha[64] = {
 
 // PENALIDADE POR PEÕES DOBRADOS (valor em centipawns)
 // Aplicada quando há 2+ peões da mesma cor na mesma coluna
-// Exemplo: 3 peões dobrados = 2 × 10 = -20 pontos de penalidade
-int peao_dobrado_penalidade = 10;
+// Exemplo: 3 peões dobrados = 2 × 5 = -10 pontos de penalidade
+// Valor reduzido: peões dobrados são ruins mas não justificam sacrificar material
+int peao_dobrado_penalidade = 5;
 
 // PENALIDADE POR PEÕES ISOLADOS (valor em centipawns)  
 // Aplicada quando um peão não tem peões amigos nas colunas adjacentes
-// Peões isolados são vulneráveis pois não podem ser defendidos por outros peões
-int peao_isolado_penalidade = 20;
+// Peões isolados são vulneráveis mas não tão graves quanto se pensava
+// Valor reduzido de 20 para 8
+int peao_isolado_penalidade = 8;
 
 // BÔNUS POR PEÕES PASSADOS (valor em centipawns por fileira)
-// Índice = fileira do peão (0-7), valor = bônus concedido
-// Peões mais avançados recebem bônus maior (mais próximos da promoção)
+// Valores reduzidos para não supervalorizar peões passados distantes
 // peao_passado_bonus[0] = 0   (1ª fileira - posição inicial)
-// peao_passado_bonus[1] = 10  (2ª fileira)
-// peao_passado_bonus[2] = 20  (3ª fileira)
-// ...
-// peao_passado_bonus[6] = 90  (7ª fileira - quase promovendo!)
-// peao_passado_bonus[7] = 0   (8ª fileira - não há peões aqui normalmente)
-int peao_passado_bonus[8] = {0, 10, 20, 30, 50, 70, 90, 0};
+// peao_passado_bonus[1] = 5   (2ª fileira) - antes era 10
+// peao_passado_bonus[2] = 10  (3ª fileira) - antes era 20
+// peao_passado_bonus[3] = 15  (4ª fileira) - antes era 30
+// peao_passado_bonus[4] = 25  (5ª fileira) - antes era 50
+// peao_passado_bonus[5] = 40  (6ª fileira) - antes era 70
+// peao_passado_bonus[6] = 60  (7ª fileira) - antes era 90
+// peao_passado_bonus[7] = 0   (8ª fileira - não há peões aqui)
+int peao_passado_bonus[8] = {0, 5, 10, 15, 25, 40, 60, 0};
 
 // =============================================================================
 // TABELAS DE VALORES POSICIONAIS DAS PEÇAS
@@ -66,15 +69,15 @@ int peao_passado_bonus[8] = {0, 10, 20, 30, 50, 70, 90, 0};
 // Baseadas em valores clássicos de engines como Stockfish, Fruit e CPW-Engine
 // Valores do ponto de vista das peças brancas (a1=0, h8=63)
 
-// Tabela de valores posicionais para peões
+// Tabela de valores posicionais para peões (valores reduzidos)
 int pawn_table[64] = {
     0, 0, 0, 0, 0, 0, 0, 0,         // 1ª fileira (a1-h1)
-    5, 10, 10, -20, -20, 10, 10, 5, // 2ª fileira (a2-h2)
-    5, -5, -10, 0, 0, -10, -5, 5,   // 3ª fileira (a3-h3)
-    0, 0, 0, 20, 20, 0, 0, 0,       // 4ª fileira (a4-h4)
-    5, 5, 10, 25, 25, 10, 5, 5,     // 5ª fileira (a5-h5)
-    10, 10, 20, 30, 30, 20, 10, 10, // 6ª fileira (a6-h6)
-    50, 50, 50, 50, 50, 50, 50, 50, // 7ª fileira (a7-h7)
+    5, 5, 5, -10, -10, 5, 5, 5,     // 2ª fileira (a2-h2) - reduzido de -20 para -10
+    2, -2, -5, 0, 0, -5, -2, 2,     // 3ª fileira (a3-h3) - reduzido pela metade
+    0, 0, 0, 10, 10, 0, 0, 0,       // 4ª fileira (a4-h4) - reduzido de 20 para 10
+    2, 2, 5, 12, 12, 5, 2, 2,       // 5ª fileira (a5-h5) - reduzido pela metade
+    5, 5, 10, 15, 15, 10, 5, 5,     // 6ª fileira (a6-h6) - reduzido pela metade
+    25, 25, 25, 25, 25, 25, 25, 25, // 7ª fileira (a7-h7) - reduzido de 50 para 25
     0, 0, 0, 0, 0, 0, 0, 0          // 8ª fileira (a8-h8)
 };
 
