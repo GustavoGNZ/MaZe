@@ -25,12 +25,11 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-
-    lances listaLances[1];
-    gerar_lances(listaLances);
+    // lances listaLances[1];
+    // gerar_lances(listaLances);
     // sort_moves(listaLances);
 
-    uci_loop();
+    // uci_loop();
 
     return 0;
 }

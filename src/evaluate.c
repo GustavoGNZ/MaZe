@@ -15,8 +15,8 @@ u64 peao_passado_preto_masks[64];
 
 int coluna_semilivre_bonus = 6;
 int coluna_livre_bonus = 12;
-int rei_seguro_bonus = 20;
-int desenvolvimento_bonus = 10;
+int rei_coluna_livre_penalidade = 20;      // Penalidade por rei em coluna livre
+int rei_coluna_semilivre_penalidade = 12;  // Penalidade por rei em coluna semi-livre
 // Array para converter índice de casa (0-63) para número da fileira (0-7)
 // ====================================================================
 // Sistema de coordenadas do tabuleiro:
@@ -635,6 +635,62 @@ int evaluate_open_files()
         clearBit(damas_pretas, casa);
     }
     
+    // AVALIAR REIS (PENALIDADES POR ESTAR EM COLUNAS VULNERÁVEIS)
+    // ============================================================
+    // Reis em colunas livres ou semi-livres são vulneráveis a ataques de torres/damas
+    
+    // AVALIAR REI BRANCO
+    u64 rei_branco = bitboards[K];
+    if (rei_branco)
+    {
+        int casa = getLeastBitIndex(rei_branco);
+        int coluna = casa % 8;
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_brancos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Rei em coluna livre = muito perigoso
+            score -= rei_coluna_livre_penalidade;
+            printf("Rei branco vulnerável em coluna livre %d\n", coluna);
+        }
+        else if (!tem_peoes_brancos && tem_peoes_pretos)
+        {
+            // Rei em coluna semi-livre = perigoso
+            score -= rei_coluna_semilivre_penalidade;
+            printf("Rei branco vulnerável em coluna semi-livre %d\n", coluna);
+        }
+    }
+    
+    // AVALIAR REI PRETO
+    u64 rei_preto = bitboards[k];
+    if (rei_preto)
+    {
+        int casa = getLeastBitIndex(rei_preto);
+        int coluna = casa % 8;
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_brancos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Rei em coluna livre = muito perigoso para pretas = bônus para brancas
+            score += rei_coluna_livre_penalidade;
+            printf("Rei preto vulnerável em coluna livre %d\n", coluna);
+        }
+        else if (tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Rei em coluna semi-livre = perigoso para pretas = bônus para brancas
+            score += rei_coluna_semilivre_penalidade;
+            printf("Rei preto vulnerável em coluna semi-livre %d\n", coluna);
+        }
+    }
+    
     return score;
 }
 
@@ -671,15 +727,19 @@ int evaluate()
 
     // Avaliação material
     score += evaluate_material();
+    printf("Avaliação material: %d\n", score);
 
     // Avaliação posicional
     score += evaluate_positional();
+    printf("Avaliação posicional: %d\n", score);
 
     // Avaliação de estrutura de peões (dobrados, isolados, passados)
     score += evaluate_pawn_structure();
+    printf("Avaliação estrutura de peões: %d\n", score);
 
     // Avaliação de colunas livres e semi-livres
     score += evaluate_open_files();
+    printf("Avaliação colunas livres/semi-livres: %d\n", score);
 
     // Retorna a avaliação do ponto de vista do lado a jogar
     return (lado_a_jogar == branco) ? score : -score;

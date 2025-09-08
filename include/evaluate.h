@@ -28,8 +28,8 @@ extern int peao_isolado_penalidade;
 extern int peao_passado_bonus[8];// Bônus por avanço do peão passado
 extern int coluna_semilivre_bonus;
 extern int coluna_livre_bonus;
-extern int rei_seguro_bonus;
-extern int desenvolvimento_bonus;
+extern int rei_coluna_livre_penalidade;
+extern int rei_coluna_semilivre_penalidade;
 
 
 u64 set_file_rank_masks(int file, int rank);
