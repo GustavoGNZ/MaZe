@@ -1,5 +1,6 @@
 #include "../include/bitboard.h"
 #include "../include/ataques.h"
+#include "../include/evaluate.h"
 #include <string.h>
 
 u64 bitboards[12];
@@ -133,6 +134,8 @@ void printTabuleiro()
     printf("%c", (roque & reiPreto_alaRei)      ? 'k' : '-');
     printf("%c", (roque & reiPreto_alaDama)     ? 'q' : '-');
     printf("\n");
+
+    printf("Score: %d\n", evaluate());
 }
 
 void printCasasAtacadasPeloLado(int lado){

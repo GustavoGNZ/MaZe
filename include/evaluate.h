@@ -21,7 +21,11 @@ extern u64 linha_masks[64];
 extern u64 peao_isolado_masks[64];
 extern u64 peao_passado_branco_masks[64];
 extern u64 peao_passado_preto_masks[64];
+extern int get_linha[64];
 
+extern int peao_dobrado_penalidade;
+extern int peao_isolado_penalidade;
+extern int peao_passado_bonus[8];// Bônus por avanço do peão passado
 
 u64 set_file_rank_masks(int file, int rank);
 u64 set_passed_pawn_mask_white(int file, int rank);
@@ -32,6 +36,7 @@ void init_evaluation_masks();
 // Funções de avaliação específicas
 int evaluate_material();
 int evaluate_positional();
+int evaluate_pawn_structure();
 
 // Função principal de avaliação
 int evaluate();
