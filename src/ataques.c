@@ -1,6 +1,7 @@
 #include "../include/ataques.h"
 #include "../include/globals.h"
 #include "../include/bitboard.h"
+#include "../include/evaluate.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -503,7 +504,8 @@ void runEngine()
     // adicionar funcoes futuras que precisam ser inicializadas
 
     inicializarAtaquesPecas();
-    // inicializarMagicNumbers(); ja estao gerados
+    init_evaluation_masks();
+
 }
 
 int casaEstaAtacada(int casa, int lado)

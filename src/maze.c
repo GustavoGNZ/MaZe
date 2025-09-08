@@ -24,14 +24,14 @@ int main()
     u64 tabuleiro = 0ULL;
 
     runEngine();
-    parseFEN(repeticao);
-    printTabuleiro();
-    busca_lance(8);
+    // parseFEN(repeticao);
+    // printTabuleiro();
+    // busca_lance(8);
 
-    lances listaLances[1];
-    gerar_lances(listaLances);
+    // lances listaLances[1];
+    // gerar_lances(listaLances);
     // printListaLances(listaLances); // ruim no windows
-    sort_moves(listaLances);
+    // sort_moves(listaLances);
     // print_move_scores();
     // printListaLances(listaLances);
 
