@@ -12,11 +12,16 @@ u64 linha_masks[64];
 u64 peao_isolado_masks[64];
 u64 peao_passado_branco_masks[64];
 u64 peao_passado_preto_masks[64];
+
+int coluna_semilivre_bonus = 6;
+int coluna_livre_bonus = 12;
+int rei_seguro_bonus = 20;
+int desenvolvimento_bonus = 10;
 // Array para converter índice de casa (0-63) para número da fileira (0-7)
 // ====================================================================
 // Sistema de coordenadas do tabuleiro:
 // - Casa 0 = a1 (fileira 0), Casa 7 = h1 (fileira 0)
-// - Casa 8 = a2 (fileira 1), Casa 15 = h2 (fileira 1)  
+// - Casa 8 = a2 (fileira 1), Casa 15 = h2 (fileira 1)
 // - Casa 56 = a8 (fileira 7), Casa 63 = h8 (fileira 7)
 //
 // Para peões BRANCOS: fileira 0 = posição inicial, fileira 7 = quase promovendo
@@ -26,14 +31,14 @@ u64 peao_passado_preto_masks[64];
 // - Casa 12 (e2) → get_linha[12] = 1 (segunda fileira)
 // - Casa 36 (e5) → get_linha[36] = 4 (quinta fileira)
 int get_linha[64] = {
-    0,0,0,0,0,0,0,0,  // Fileira 1: a1-h1 (fileira 0)
-    1,1,1,1,1,1,1,1,  // Fileira 2: a2-h2 (fileira 1)
-    2,2,2,2,2,2,2,2,  // Fileira 3: a3-h3 (fileira 2)
-    3,3,3,3,3,3,3,3,  // Fileira 4: a4-h4 (fileira 3)
-    4,4,4,4,4,4,4,4,  // Fileira 5: a5-h5 (fileira 4)
-    5,5,5,5,5,5,5,5,  // Fileira 6: a6-h6 (fileira 5)
-    6,6,6,6,6,6,6,6,  // Fileira 7: a7-h7 (fileira 6)
-    7,7,7,7,7,7,7,7   // Fileira 8: a8-h8 (fileira 7)
+    0, 0, 0, 0, 0, 0, 0, 0, // Fileira 1: a1-h1 (fileira 0)
+    1, 1, 1, 1, 1, 1, 1, 1, // Fileira 2: a2-h2 (fileira 1)
+    2, 2, 2, 2, 2, 2, 2, 2, // Fileira 3: a3-h3 (fileira 2)
+    3, 3, 3, 3, 3, 3, 3, 3, // Fileira 4: a4-h4 (fileira 3)
+    4, 4, 4, 4, 4, 4, 4, 4, // Fileira 5: a5-h5 (fileira 4)
+    5, 5, 5, 5, 5, 5, 5, 5, // Fileira 6: a6-h6 (fileira 5)
+    6, 6, 6, 6, 6, 6, 6, 6, // Fileira 7: a7-h7 (fileira 6)
+    7, 7, 7, 7, 7, 7, 7, 7  // Fileira 8: a8-h8 (fileira 7)
 };
 
 // Parâmetros de avaliação da estrutura de peões
@@ -45,7 +50,7 @@ int get_linha[64] = {
 // Valor reduzido: peões dobrados são ruins mas não justificam sacrificar material
 int peao_dobrado_penalidade = 5;
 
-// PENALIDADE POR PEÕES ISOLADOS (valor em centipawns)  
+// PENALIDADE POR PEÕES ISOLADOS (valor em centipawns)
 // Aplicada quando um peão não tem peões amigos nas colunas adjacentes
 // Peões isolados são vulneráveis mas não tão graves quanto se pensava
 // Valor reduzido de 20 para 8
@@ -167,14 +172,14 @@ u64 set_file_rank_masks(int file, int rank)
             {
                 if (file == j)
                 {
-                    mask |= setBit(mask, casa);
+                    setBit(mask, casa);
                 }
             }
             if (rank != -1)
             {
                 if (rank == i)
                 {
-                    mask |= setBit(mask, casa);
+                    setBit(mask, casa);
                 }
             }
         }
@@ -191,26 +196,26 @@ u64 set_file_rank_masks(int file, int rank)
 u64 set_passed_pawn_mask_white(int file, int rank)
 {
     u64 mask = 0ULL;
-    
+
     // Para peões brancos, verificar fileiras à frente (rank + 1 até 7)
     for (int r = rank + 1; r < 8; r++)
     {
         // Coluna da esquerda (se existir)
         if (file > 0)
         {
-            mask |= setBit(mask, r * 8 + (file - 1));
+            setBit(mask, r * 8 + (file - 1));
         }
-        
+
         // Coluna do próprio peão
-        mask |= setBit(mask, r * 8 + file);
-        
+        setBit(mask, r * 8 + file);
+
         // Coluna da direita (se existir)
         if (file < 7)
         {
-            mask |= setBit(mask, r * 8 + (file + 1));
+            setBit(mask, r * 8 + (file + 1));
         }
     }
-    
+
     return mask;
 }
 
@@ -223,26 +228,26 @@ u64 set_passed_pawn_mask_white(int file, int rank)
 u64 set_passed_pawn_mask_black(int file, int rank)
 {
     u64 mask = 0ULL;
-    
+
     // Para peões pretos, verificar fileiras à frente (rank - 1 até 0)
     for (int r = rank - 1; r >= 0; r--)
     {
         // Coluna da esquerda (se existir)
         if (file > 0)
         {
-            mask |= setBit(mask, r * 8 + (file - 1));
+            setBit(mask, r * 8 + (file - 1));
         }
-        
+
         // Coluna do próprio peão
-        mask |= setBit(mask, r * 8 + file);
-        
+        setBit(mask, r * 8 + file);
+
         // Coluna da direita (se existir)
         if (file < 7)
         {
-            mask |= setBit(mask, r * 8 + (file + 1));
+            setBit(mask, r * 8 + (file + 1));
         }
     }
-    
+
     return mask;
 }
 
@@ -256,13 +261,11 @@ void init_evaluation_masks()
             linha_masks[casa] = set_file_rank_masks(-1, linha);
             coluna_masks[casa] = set_file_rank_masks(coluna, -1);
             peao_isolado_masks[casa] = set_file_rank_masks(coluna - 1, -1) | set_file_rank_masks(coluna + 1, -1);
-            
+
             peao_passado_branco_masks[casa] = set_passed_pawn_mask_white(coluna, linha);
             peao_passado_preto_masks[casa] = set_passed_pawn_mask_black(coluna, linha);
         }
     }
-
-
 }
 
 /**
@@ -355,39 +358,39 @@ int evaluate_positional()
 
 /**
  * @brief Avalia a estrutura completa de peões
- * 
+ *
  * Analisa peões dobrados, isolados e passados em uma única passada pelos bitboards.
  * Isso é mais eficiente que fazer múltiplas avaliações separadas.
- * 
+ *
  * SISTEMA DE PONTUAÇÃO:
  * - Valores POSITIVOS favorecem as brancas
  * - Valores NEGATIVOS favorecem as pretas
  * - Penalidades são subtraídas do score das brancas (ou somadas para pretas)
  * - Bônus são adicionados ao score das brancas (ou subtraídos para pretas)
- * 
+ *
  * @return Score da estrutura de peões (positivo favorece brancas)
  */
 int evaluate_pawn_structure()
 {
     int score = 0;
-    
+
     // Obter bitboards dos peões de ambas as cores
     u64 peoes_brancos = bitboards[P];
     u64 peoes_pretos = bitboards[p];
-    
+
     // =========================================================================
     // PARTE 1: ANÁLISE POR COLUNA (Peões dobrados e isolados)
     // =========================================================================
-    
+
     for (int coluna = 0; coluna < 8; coluna++)
     {
         // Máscara da coluna atual (todas as casas da coluna a-h)
         u64 mascara_coluna = coluna_masks[coluna * 8];
-        
+
         // Filtrar apenas os peões que estão nesta coluna
         u64 peoes_brancos_coluna = peoes_brancos & mascara_coluna;
         u64 peoes_pretos_coluna = peoes_pretos & mascara_coluna;
-        
+
         // Contar quantos peões de cada cor há nesta coluna
         // Usando bit manipulation: temp &= temp - 1 remove o bit menos significativo
         int contador_brancos = 0;
@@ -397,7 +400,7 @@ int evaluate_pawn_structure()
             contador_brancos++;
             temp_brancos &= temp_brancos - 1; // Remove 1 bit por vez
         }
-        
+
         int contador_pretos = 0;
         u64 temp_pretos = peoes_pretos_coluna;
         while (temp_pretos)
@@ -405,13 +408,13 @@ int evaluate_pawn_structure()
             contador_pretos++;
             temp_pretos &= temp_pretos - 1; // Remove 1 bit por vez
         }
-        
+
         // ---------------------------------------------------------------------
         // PEÕES DOBRADOS - Penalidade por ter múltiplos peões na mesma coluna
         // ---------------------------------------------------------------------
         // Lógica: Se há N peões na coluna, aplicar penalidade para (N-1) peões extras
         // Exemplo: 3 peões na coluna = penalidade de 2 × 10 = -20 pontos
-        
+
         if (contador_brancos > 1)
         {
             // Penalidade para brancas (valor negativo diminui score das brancas)
@@ -424,15 +427,15 @@ int evaluate_pawn_structure()
             score += peao_dobrado_penalidade * (contador_pretos - 1);
             // Ex: 2 peões pretos dobrados = score += 10 * (2-1) = score += 10
         }
-        
+
         // ---------------------------------------------------------------------
         // PEÕES ISOLADOS - Penalidade por não ter peões amigos nas colunas adjacentes
         // ---------------------------------------------------------------------
         // Lógica: Se há peões nesta coluna MAS não há peões nas colunas vizinhas,
         // então estes peões são "isolados" e vulneráveis
-        
+
         u64 mascara_isolado = peao_isolado_masks[coluna * 8]; // colunas adjacentes (coluna-1 e coluna+1)
-        
+
         if (contador_brancos > 0 && !(peoes_brancos & mascara_isolado))
         {
             // Há peões brancos nesta coluna E não há peões brancos nas colunas vizinhas
@@ -447,13 +450,13 @@ int evaluate_pawn_structure()
             // Ex: 1 peão preto isolado = score += 20 * 1 = score += 20
         }
     }
-    
+
     // =========================================================================
     // PARTE 2: ANÁLISE INDIVIDUAL (Peões passados)
     // =========================================================================
     // Agora analisamos cada peão individualmente para ver se é "passado"
     // Um peão passado é aquele que não tem peões inimigos bloqueando seu caminho à promoção
-    
+
     // ---------------------------------------------------------------------
     // PEÕES PASSADOS BRANCOS
     // ---------------------------------------------------------------------
@@ -462,7 +465,7 @@ int evaluate_pawn_structure()
     {
         int casa = getLeastBitIndex(temp);
         int linha = get_linha[casa]; // Linha do peão (0=primeira fileira, 7=oitava fileira)
-        
+
         // Verificar se é peão passado usando a máscara pré-calculada
         // A máscara contém todas as casas que um peão inimigo precisaria ocupar para bloquear este peão
         if (!(peoes_pretos & peao_passado_branco_masks[casa]))
@@ -472,10 +475,10 @@ int evaluate_pawn_structure()
             score += peao_passado_bonus[linha];
             // Ex: Peão branco na 6ª fileira (linha=5) = score += peao_passado_bonus[5] = score += 70
         }
-        
+
         clearBit(temp, casa); // Remove este peão e continua para o próximo
     }
-    
+
     // ---------------------------------------------------------------------
     // PEÕES PASSADOS PRETOS
     // ---------------------------------------------------------------------
@@ -484,7 +487,7 @@ int evaluate_pawn_structure()
     {
         int casa = getLeastBitIndex(temp);
         int linha = get_linha[casa]; // Linha do peão
-        
+
         // Verificar se é peão passado
         if (!(peoes_brancos & peao_passado_preto_masks[casa]))
         {
@@ -493,8 +496,143 @@ int evaluate_pawn_structure()
             score -= peao_passado_bonus[7 - linha];
             // Ex: Peão preto na 3ª fileira (linha=2) = score -= peao_passado_bonus[7-2] = score -= peao_passado_bonus[5] = score -= 70
         }
-        
+
         clearBit(temp, casa);
+    }
+
+    return score;
+}
+
+/**
+ * @brief Avalia colunas livres e semi-livres
+ *
+ * DEFINIÇÕES:
+ * - Coluna livre: Sem peões de ambas as cores
+ * - Coluna semi-livre (para lado): Sem peões do próprio lado, mas tem peões inimigos
+ *
+ * BONIFICAÇÕES (baseadas nas variáveis globais):
+ * - Torres em colunas livres: +coluna_livre_bonus pontos (12)
+ * - Torres em colunas semi-livres: +coluna_semilivre_bonus pontos (6)
+ * - Damas em colunas livres: +coluna_livre_bonus/2 pontos (6)
+ * - Damas em colunas semi-livres: +coluna_semilivre_bonus/2 pontos (3)
+ *
+ * @return Score das colunas livres/semi-livres (positivo favorece brancas)
+ */
+int evaluate_open_files()
+{
+    int score = 0;
+
+    // Obter bitboards dos peões
+    u64 peoes_brancos = bitboards[P];
+    u64 peoes_pretos = bitboards[p];
+    
+    // AVALIAR TORRES BRANCAS
+    u64 torres_brancas = bitboards[R];
+    while (torres_brancas)
+    {
+        int casa = getLeastBitIndex(torres_brancas);
+        int coluna = casa % 8; // Extrair coluna da casa (0-7)
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_brancos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna livre
+            score += coluna_livre_bonus;
+            printf("Coluna livre para brancas na coluna %d\n", coluna);
+        }
+        else if (!tem_peoes_brancos && tem_peoes_pretos)
+        {
+            // Coluna semi-livre para brancas
+            score += coluna_semilivre_bonus;
+            printf("Coluna semi-livre para brancas na coluna %d\n", coluna);
+        }
+        
+        clearBit(torres_brancas, casa);
+    }
+    
+    // AVALIAR TORRES PRETAS
+    u64 torres_pretas = bitboards[r];
+    while (torres_pretas)
+    {
+        int casa = getLeastBitIndex(torres_pretas);
+        int coluna = casa % 8; // Extrair coluna da casa (0-7)
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_pretos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna livre
+            score -= coluna_livre_bonus;
+            printf("Coluna livre para pretas na coluna %d\n", coluna);
+        }
+        else if (tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna semi-livre para pretas
+            score -= coluna_semilivre_bonus;
+            printf("Coluna semi-livre para pretas na coluna %d\n", coluna);
+        }
+        
+        clearBit(torres_pretas, casa);
+    }
+    
+    // AVALIAR DAMAS BRANCAS
+    u64 damas_brancas = bitboards[Q];
+    while (damas_brancas)
+    {
+        int casa = getLeastBitIndex(damas_brancas);
+        int coluna = casa % 8; // Extrair coluna da casa (0-7)
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_brancos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna livre (50% do bônus das torres)
+            score += coluna_livre_bonus / 2;
+
+        }
+        else if (!tem_peoes_brancos && tem_peoes_pretos)
+        {
+            // Coluna semi-livre para brancas (50% do bônus das torres)
+            score += coluna_semilivre_bonus / 2;
+        }
+        
+        clearBit(damas_brancas, casa);
+    }
+    
+    // AVALIAR DAMAS PRETAS
+    u64 damas_pretas = bitboards[q];
+    while (damas_pretas)
+    {
+        int casa = getLeastBitIndex(damas_pretas);
+        int coluna = casa % 8; // Extrair coluna da casa (0-7)
+        u64 mascara_coluna = coluna_masks[casa];
+        
+        // Verificar se há peões nesta coluna
+        int tem_peoes_brancos = (peoes_pretos & mascara_coluna) != 0;
+        int tem_peoes_pretos = (peoes_pretos & mascara_coluna) != 0;
+        
+        if (!tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna livre (50% do bônus das torres)
+            score -= coluna_livre_bonus / 2;
+        }
+        else if (tem_peoes_brancos && !tem_peoes_pretos)
+        {
+            // Coluna semi-livre para pretas (50% do bônus das torres)
+            score -= coluna_semilivre_bonus / 2;
+        }
+        
+        clearBit(damas_pretas, casa);
     }
     
     return score;
@@ -506,7 +644,7 @@ int evaluate_pawn_structure()
  * ESTRATÉGIA DE AVALIAÇÃO:
  * ========================
  * A função combina múltiplas heurísticas para avaliar uma posição de xadrez:
- * 
+ *
  * 1. MATERIAL: Soma dos valores das peças (Peão=100, Cavalo=320, etc.)
  * 2. POSICIONAL: Bônus/penalidades baseados na posição das peças no tabuleiro
  * 3. ESTRUTURA DE PEÕES: Analisa fraquezas e forças na formação de peões
@@ -539,6 +677,9 @@ int evaluate()
 
     // Avaliação de estrutura de peões (dobrados, isolados, passados)
     score += evaluate_pawn_structure();
+
+    // Avaliação de colunas livres e semi-livres
+    score += evaluate_open_files();
 
     // Retorna a avaliação do ponto de vista do lado a jogar
     return (lado_a_jogar == branco) ? score : -score;
