@@ -105,11 +105,11 @@ void enable_pv_scoring(lances *listaLances) {
 }
 
 /*
- * =============================================================================
- * TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
- * =============================================================================
- * 
- * A tabela triangular da variação principal é uma estrutura de dados usada em motores de xadrez
+ =============================================================================
+  TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
+  =============================================================================
+  
+  A tabela triangular da variação principal é uma estrutura de dados usada em motores de xadrez
 para armazenar e recuperar a melhor sequência de lances encontrada durante a busca.
 
 ESTRUTURA:
@@ -456,8 +456,6 @@ void busca_lance(int depth)
     printLance(pv_table[0][0]); // é o melhor lance da linha principal
     printf("\n");
 }
-
-
 
 int score_move(int move)
 {
