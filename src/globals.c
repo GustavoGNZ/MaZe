@@ -1,27 +1,98 @@
+/**
+ * @file globals.c
+ * @brief Implementação de variáveis globais e funções auxiliares da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo contém a implementação de todas as variáveis globais da engine,
+ * incluindo tabelas de ataques, magic numbers, histórico de posições e
+ * funções para detecção de repetição.
+ */
+
 #include "../include/globals.h"
 
-// Variável global para backup do estado do jogo
+// =============================================================================
+// VARIÁVEIS DE ESTADO DO JOGO
+// =============================================================================
+
+/**
+ * @brief Variável global para backup do estado do jogo
+ */
 estado_jogo backup_global;
 
-// Histórico de posições para detecção de repetição
+// =============================================================================
+// SISTEMA DE HISTÓRICO E DETECÇÃO DE REPETIÇÃO
+// =============================================================================
+
+/**
+ * @brief Histórico de posições para detecção de repetição
+ */
 u64 historico_posicoes[MAX_HISTORIA];
+
+/**
+ * @brief Contador do histórico de posições
+ */
 int contador_historia = 0;
 
-// Histórico de lances para livro de aberturas
+/**
+ * @brief Histórico de lances para livro de aberturas
+ */
 int historico_lances_partida[MAX_LANCES_PARTIDA];
+
+/**
+ * @brief Número de lances jogados na partida atual
+ */
 int num_lances_partida = 0;
 
+// =============================================================================
+// TABELAS DE ATAQUES PRÉ-CALCULADAS
+// =============================================================================
+
+/**
+ * @brief Tabela de ataques de peões [lado][casa]
+ */
 u64 tabela_ataques_peao[2][64];
+
+/**
+ * @brief Tabela de ataques de cavalos por casa
+ */
 u64 tabela_ataques_cavalo[64];
+
+/**
+ * @brief Tabela de ataques de reis por casa
+ */
 u64 tabela_ataques_rei[64];
 
+/**
+ * @brief Máscaras de ataques para bispos (sem bloqueios)
+ */
 u64 mask_tabela_ataques_bispo[64];
+
+/**
+ * @brief Máscaras de ataques para torres (sem bloqueios)
+ */
 u64 mask_tabela_ataques_torre[64];
 
+/**
+ * @brief Tabela completa de ataques de bispos [casa][índice_ocupação]
+ */
 u64 tabela_ataques_bispo[64][512];
+
+/**
+ * @brief Tabela completa de ataques de torres [casa][índice_ocupação]
+ */
 u64 tabela_ataques_torre[64][4096];
 
-// gerado usando um for que percorre todas as casas do tabuleiro e conta os bits de cada retorno da funcao gerar_ataque_bispo e gerar_ataque_torre
+// =============================================================================
+// MAGIC BITBOARDS - DADOS PRÉ-CALCULADOS
+// =============================================================================
+
+/**
+ * @brief Número de bits relevantes para cada casa do bispo
+ * 
+ * Gerado usando análise de todas as casas do tabuleiro e contagem
+ * dos bits de cada retorno da função gerar_ataque_bispo
+ */
 const int bits_relevantes_bispo[64] = {
     6, 5, 5, 5, 5, 5, 5, 6,
     5, 5, 5, 5, 5, 5, 5, 5,
@@ -30,8 +101,15 @@ const int bits_relevantes_bispo[64] = {
     5, 5, 7, 9, 9, 7, 5, 5,
     5, 5, 7, 7, 7, 7, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5,
-    6, 5, 5, 5, 5, 5, 5, 6};
+    6, 5, 5, 5, 5, 5, 5, 6
+};
 
+/**
+ * @brief Número de bits relevantes para cada casa da torre
+ * 
+ * Gerado usando análise de todas as casas do tabuleiro e contagem
+ * dos bits de cada retorno da função gerar_ataque_torre
+ */
 const int bits_relevantes_torre[64] = {
     12, 11, 11, 11, 11, 11, 11, 12,
     11, 10, 10, 10, 10, 10, 10, 11,
@@ -40,9 +118,16 @@ const int bits_relevantes_torre[64] = {
     11, 10, 10, 10, 10, 10, 10, 11,
     11, 10, 10, 10, 10, 10, 10, 11,
     11, 10, 10, 10, 10, 10, 10, 11,
-    12, 11, 11, 11, 11, 11, 11, 12};
+    12, 11, 11, 11, 11, 11, 11, 12
+};
 
-// gerado usando init_magic_numbers() em versoes anteriores do codigo e depois atualizado manualmente nesta variavel para nunca mais precisar procurar magic numbers para bispo
+/**
+ * @brief Magic numbers para bispos em cada casa do tabuleiro
+ * 
+ * Gerado usando init_magic_numbers() em versões anteriores do código
+ * e depois hard-coded nesta variável para otimização de performance.
+ * Permite cálculo rápido de ataques de bispo usando magic bitboards.
+ */
 u64 magics_bispo[64] = {
     0x40040844404084ULL,
     0x2004208a004208ULL,
@@ -110,7 +195,13 @@ u64 magics_bispo[64] = {
     0x4010011029020020ULL,
 };
 
-// gerado usando init_magic_numbers() em versoes anteriores do codigo e depois atualizado manualmente nesta variavel para nunca mais precisar procurar magic numbers para torre
+/**
+ * @brief Magic numbers para torres em cada casa do tabuleiro
+ * 
+ * Gerado usando init_magic_numbers() em versões anteriores do código
+ * e depois hard-coded nesta variável para otimização de performance.
+ * Permite cálculo rápido de ataques de torre usando magic bitboards.
+ */
 u64 magics_torre[64] = {
     0x8a80104000800020ULL,
     0x140002000100040ULL,
@@ -178,7 +269,18 @@ u64 magics_torre[64] = {
     0x1004081002402ULL,
 };
 
-// Função simples para gerar hash da posição
+// =============================================================================
+// FUNÇÕES DE DETECÇÃO DE REPETIÇÃO
+// =============================================================================
+
+/**
+ * @brief Gera um hash simples da posição atual
+ * 
+ * Cria um hash da posição baseado nos bitboards das peças, lado a jogar,
+ * direitos de roque e en passant. Usado para detecção de repetição.
+ * 
+ * @return Hash da posição atual
+ */
 u64 hash_posicao_simples() {
     u64 hash = 0;
     
@@ -204,7 +306,12 @@ u64 hash_posicao_simples() {
     return hash;
 }
 
-// Adicionar posição atual ao histórico
+/**
+ * @brief Adiciona a posição atual ao histórico de repetição
+ * 
+ * Calcula o hash da posição atual e adiciona ao histórico para
+ * futura detecção de repetição de posições.
+ */
 void adicionar_posicao_historia() {
     if (contador_historia < MAX_HISTORIA) {
         historico_posicoes[contador_historia] = hash_posicao_simples();
@@ -212,7 +319,15 @@ void adicionar_posicao_historia() {
     }
 }
 
-// Verificar se a posição atual já ocorreu antes
+/**
+ * @brief Verifica se a posição atual já ocorreu antes (repetição)
+ * 
+ * Compara o hash da posição atual com o histórico de posições
+ * para detectar repetições. Retorna 1 se encontrar pelo menos
+ * 3 ocorrências da mesma posição.
+ * 
+ * @return 1 se posição foi repetida, 0 caso contrário
+ */
 int posicao_repetida() {
     u64 hash_atual = hash_posicao_simples();
     int contador = 0;
@@ -228,13 +343,16 @@ int posicao_repetida() {
     return 0;
 }
 
-// Limpar histórico
+/**
+ * @brief Limpa o histórico de posições
+ * 
+ * Remove todas as posições armazenadas no histórico,
+ * resetando o contador para zero.
+ */
 void limpar_historia() {
     contador_historia = 0;
     for (int i = 0; i < MAX_HISTORIA; i++) {
         historico_posicoes[i] = 0;
     }
 }
-
-
 

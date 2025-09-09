@@ -1,103 +1,168 @@
 # ♟️ MaZe – Chess Engine
 
-
 ![Language](https://img.shields.io/badge/language-C-blue?style=flat-square)
+![Documentation](https://img.shields.io/badge/docs-Doxygen-green?style=flat-square)
+![Status](https://img.shields.io/badge/status-Active-brightgreen?style=flat-square)
 
+**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), implementando algoritmos de busca avançados, avaliação de posições e protocolo UCI completo usando bitboards para máxima eficiência.
 
-**MaZe** é uma engine de xadrez desenvolvida em C como parte do Trabalho de Conclusão de Curso (TCC), com foco na construção de uma base modular e eficiente para representação de estados e geração de jogadas usando bitboards.
-
-O nome surgiu da junção dos nomes das duas pessoas mais importantes da minha vida: minha mãe Marta e meu pai José, que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
-
+O nome surgiu da junção dos nomes das duas pessoas mais importantes da minha vida: minha mãe **Ma**rta e meu pai José (**Ze**), que sempre me apoiaram e me deram a base para ser quem eu sou hoje.
 
 ---
 
 ## 📚 Sobre o Projeto
 
-Este projeto tem como objetivo estudar e implementar os princípios fundamentais de uma engine de xadrez, com destaque para:
+Este projeto implementa uma engine de xadrez completa e funcional, com foco em:
 
-- Representação de peças e tabuleiro com **bitboards**.
-- Geração de ataques previamente computados.
-- Uso de técnicas de otimização e possibilidade de análise de algoritmos como **Minimax**, **Alpha-Beta Pruning**.
-- Metaheurísticas.
+- **Bitboards** para representação eficiente do tabuleiro
+- **Magic Bitboards** para geração rápida de ataques de peças deslizantes
+- **Algoritmo Negamax** com poda alfa-beta para busca de lances
+- **Quiescence Search** para estabilização de posições táticas
+- **Protocolo UCI** completo para integração com GUIs
+- **Sistema de avaliação** baseado em material e posição
+- **Detecção de repetição** e controle de tempo
 
 ---
 
-## 🧠 Funcionalidades Atuais
+## 🧠 Funcionalidades Implementadas
 
-- **Representação do tabuleiro via bitboard**: Sistema eficiente de representação usando 64-bit integers
-- **Geração dos ataques de todas as peças**: Ataques pré-computados para otimização
-- **Geração de jogadas legais**: Inclui direitos de Roque, En Passant e verificação de xeque
-- **Parser de strings em notação FEN**: Conversão de posições FEN para representação bitboard
-- **Sistema de backup**: Restauração de estado do tabuleiro para desfazer lances ilegais
-- **Protocolo UCI básico**: Parsing de comandos UCI incluindo position e moves
-- **Documentação completa**: Código totalmente documentado com comentários em português
+### ✅ Sistema de Representação
+- **Bitboards de 64 bits**: Representação ultra-eficiente do tabuleiro
+- **Magic Bitboards**: Geração instantânea de ataques para bispos e torres
+- **Tabelas pré-computadas**: Ataques de peões, cavalos e reis
+- **Codificação de lances**: Sistema compacto para armazenar movimentos
+
+### ✅ Geração de Lances
+- **Lances de todas as peças**: Incluindo regras especiais
+- **Roque**: Implementação completa dos direitos de roque
+- **En Passant**: Captura especial de peões
+- **Promoção**: Transformação de peões em outras peças
+- **Verificação de legalidade**: Detecção de xeque e lance legal
+
+### ✅ Sistema de Busca
+- **Algoritmo Negamax**: Busca minimax otimizada
+- **Poda Alfa-Beta**: Redução do espaço de busca
+- **Quiescence Search**: Busca de capturas para estabilizar posições
+- **Variação Principal (PV)**: Armazenamento da melhor linha
+- **Killer Moves**: Heurística de ordenação de lances
+- **History Heuristic**: Aprendizado de bons lances
+- **MVV-LVA**: Ordenação de capturas (Most Valuable Victim - Least Valuable Attacker)
+
+### ✅ Avaliação de Posições
+- **Avaliação de material**: Valores das peças balanceados
+- **Fatores posicionais**: Controle do centro, mobilidade
+- **Segurança do rei**: Penalidades por exposição
+- **Estrutura de peões**: Avaliação de fraquezas e forças
+
+### ✅ Protocolo UCI
+- **Comandos básicos**: `uci`, `isready`, `position`, `go`
+- **Parser de posições**: FEN e sequências de lances
+- **Controle de tempo**: Gestão de tempo por lance e partida
+- **Modo de análise**: Busca contínua para análise
+- **Comunicação padrão**: Interface compatível com GUIs populares
+
+### ✅ Sistemas Auxiliares
+- **Detecção de repetição**: Prevenção de loops infinitos
+- **Backup de estado**: Sistema de desfazer lances
+- **Livro de aberturas**: Integração básica com teoria
+- **Logging de partidas**: Histórico de lances jogados
+- **Documentação Doxygen**: Código completamente documentado
 
 ## 📁 Estrutura do Projeto
 
 ```
 MaZe/
-├── src/
-│   ├── maze.c          # Função principal e testes
-│   ├── bitboard.c      # Operações com bitboards
-│   ├── ataques.c       # Geração de ataques das peças
-│   ├── globals.c       # Variáveis globais e estado do jogo
-│   └── uci.c           # Implementação do protocolo UCI
-├── include/
-│   ├── bitboard.h      # Definições de bitboard
-│   ├── ataques.h       # Declarações de funções de ataque
-│   ├── globals.h       # Variáveis globais e estruturas
-│   └── uci.h           # Funções do protocolo UCI
-├── makefile            # Script de compilação
-└── README.md           # Este arquivo
+├── src/                          # Código fonte (.c)
+│   ├── maze.c                    # Função principal e posições de teste
+│   ├── bitboard.c                # Sistema de bitboards e operações básicas
+│   ├── ataques.c                 # Geração de ataques e magic bitboards
+│   ├── search.c                  # Algoritmos de busca e ordenação
+│   ├── evaluate.c                # Sistema de avaliação de posições
+│   ├── uci.c                     # Protocolo UCI e comunicação
+│   └── globals.c                 # Variáveis globais e detecção de repetição
+├── include/                      # Headers (.h) - API documentada
+│   ├── bitboard.h               # Macros, estruturas e bitboard core
+│   ├── ataques.h                # Declarações de geração de ataques
+│   ├── search.h                 # Interface dos algoritmos de busca
+│   ├── evaluate.h               # Interface do sistema de avaliação
+│   ├── uci.h                    # Interface do protocolo UCI
+│   └── globals.h                # Variáveis globais e auxiliares
+├── partidas/                    # Partidas jogadas e logs
+│   └── *.pgn                   # Arquivos PGN de partidas
+├── aberturas.txt               # Base de conhecimento de aberturas
+├── makefile                    # Script de compilação otimizada
+├── maze.exe                    # Executável da engine (Windows)
+├── LICENSE                     # Licença do projeto
+└── README.md                   # Documentação do projeto
 ```
 
-## 📈 Planejamento Futuro
+### 🏗️ Arquitetura Modular
 
-- Implementação de algoritmos de busca:
-  - Minimax
-  - Poda Alpha-Beta
-- Avaliação de posições e heurísticas simples
-- Protocolo UCI completo (go, stop, etc.)
-- Interface gráfica ou integração com GUIs populares
+- **`bitboard.h/.c`**: Core do sistema - macros, estruturas e operações básicas
+- **`ataques.h/.c`**: Magic bitboards e geração de ataques otimizada
+- **`search.h/.c`**: Negamax, poda alfa-beta, quiescence e ordenação
+- **`evaluate.h/.c`**: Avaliação material, posicional e segurança do rei
+- **`uci.h/.c`**: Protocolo padrão para comunicação com GUIs
+- **`globals.h/.c`**: Estado global, repetição e dados compartilhados
+## 🎯 Capacidades da Engine
+
+---
 
 ## ⚙️ Compilação e Uso
 
 ### 🔧 Requisitos
-- Compilador C (`gcc`)
-- `make` instalado (opcional)
+- **Compilador**: GCC 7.0+ ou Clang 6.0+
+- **Sistema**: Windows/Linux/macOS
+- **RAM**: Mínimo 64MB (recomendado 1GB+)
+- **CPU**: Qualquer arquitetura x64
 
-### 🚀 Comandos
-
-```bash
-# Compilar a versão otimizada
-make
-
-# Ou compilar manualmente
-gcc -Ofast -Iinclude -o maze src/*.c
-
-# Executar o engine
-./maze
-
-# Testar com comando UCI
-echo "uci" | ./maze
-```
-
-### 🎮 Exemplo de Uso
+### 🚀 Compilação Rápida
 
 ```bash
-# Executar uma sequência de movimentos
-./maze
-# No engine, use comandos como:
-# position startpos moves e2e4 e7e5 g1f3
-```
-
-## 💻 Instalação
-
-### Linux
-```bash
+# Clone o repositório
 git clone https://github.com/GustavoGNZ/MaZe.git
-cd maze
+cd MaZe
+
+# Compilação otimizada (recomendada)
 make
-./maze
+
+# Ou compilação manual com otimizações máximas
+gcc -Ofast -Iinclude -o maze src/maze.c src/bitboard.c src/ataques.c src/globals.c src/uci.c src/evaluate.c src/search.c src/aberturas.c
 ```
+
+### 🎮 Uso Básico
+
+```bash
+# Executar engine standalone
+./maze
+
+# Testar comunicação UCI
+echo "uci" | ./maze
+
+# Analisar posição específica
+echo -e "position startpos moves e2e4 e7e5\ngo depth 8" | ./maze
+
+# Integrar com GUI (exemplo Arena)
+# 1. Abra Arena Chess GUI
+# 2. Engines → Install Engine
+# 3. Selecione o executável 'maze'
+# 4. Configure como UCI engine
+```
+
+### 🔧 Comandos UCI Principais
+
+```uci
+uci                                    # Identificação da engine
+isready                               # Verificar se está pronta
+position startpos                     # Posição inicial
+position fen <FEN_STRING>             # Carregar posição FEN
+position startpos moves e2e4 e7e5     # Posição com lances
+go depth 8                            # Buscar até profundidade 8
+go movetime 5000                      # Buscar por 5 segundos
+go infinite                           # Busca contínua (análise)
+---
+## 📜 Licença
+
+Veja o arquivo LICENSE para detalhes.
+
 

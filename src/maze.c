@@ -1,3 +1,18 @@
+/**
+ * @file maze.c
+ * @brief Arquivo principal da engine de xadrez MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo contém o ponto de entrada principal da engine MaZe,
+ * incluindo definições de posições FEN para teste e inicialização
+ * dos sistemas da engine.
+ */
+
+// =============================================================================
+// INCLUDES
+// =============================================================================
+
 #include "../include/bitboard.h"
 #include "../include/ataques.h"
 #include "../include/globals.h"
@@ -7,26 +22,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// posicoes fen para teste
-#define posicaoVazia "8/8/8/8/8/8/8/8 w - - 0 1"
-#define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-#define posicaoTeste "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - "
-#define RUYLOPEZ "r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4"
-#define killerTeste "6k1/3q1pp1/pp5p/1r5n/8/1P3PP1/PQ4BP/2R3K1 w - - 0 1"
-#define aberturas "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"
+// =============================================================================
+// FUNÇÃO PRINCIPAL
+// =============================================================================
 
-// FENs para testar en passant
-#define enPassantBranco "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3"
-#define enPassantPreto "rnbqkbnr/pppp1ppp/8/8/3Pp3/8/PPPP1PPP/RNBQKBNR b KQkq d3 0 3"
-#define repeticao "2r3k1/R7/8/1R6/8/8/P4KPP/8 w - - 0 40"
-#define peaoDobrado "8/8/1p6/8/P7/P7/P7/8 w - - 0 1"
-#define testeSegurancaRei "rn1qkbnr/ppp2ppp/4p3/1b1p4/6B1/5N2/PP3PPP/RNBQK2R w kq - 0 1"
-
+/**
+ * @brief Função principal da engine MaZe
+ * 
+ * Inicializa todos os sistemas necessários da engine e entra no loop
+ * principal do protocolo UCI para comunicação com interfaces gráficas.
+ * 
+ * @return 0 em caso de execução bem-sucedida
+ */
 int main()
 {
-    runEngine();
-
-    uci_loop();
+    runEngine();  // Inicializa sistemas da engine (ataques, avaliação, etc.)
+    uci_loop();   // Entra no loop principal UCI
     
     return 0;
 }

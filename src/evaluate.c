@@ -1,49 +1,154 @@
+/**
+ * @file evaluate.c
+ * @brief Sistema de avaliação de posições da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo implementa o sistema completo de avaliação de posições,
+ * incluindo valores de material, avaliação posicional, estrutura de peões,
+ * segurança do rei, mobilidade das peças e máscaras de avaliação.
+ */
+
 #include "../include/evaluate.h"
 #include "../include/globals.h"
 #include "../include/bitboard.h"
 #include "../include/ataques.h"
 
+// =============================================================================
+// VALORES DE MATERIAL DAS PEÇAS
+// =============================================================================
+
+/**
+ * @brief Valores de material para cada tipo de peça
+ * 
+ * Valores positivos para peças brancas, negativos para pretas.
+ * Baseados em valores clássicos de xadrez com ajustes para performance.
+ */
 int material_score[12] = {
-    100, 320, 330, 500, 900, 20000,      // P, N, B, R, Q, K
-    -100, -320, -330, -500, -900, -20000 // p, n, b, r, q, k
+    100, 320, 330, 500, 900, 20000,      // P, N, B, R, Q, K (brancas)
+    -100, -320, -330, -500, -900, -20000 // p, n, b, r, q, k (pretas)
 };
 
-// Definições das variáveis globais para máscaras de avaliação
+// =============================================================================
+// MÁSCARAS DE AVALIAÇÃO GLOBAL
+// =============================================================================
+
+/**
+ * @brief Máscaras para colunas do tabuleiro
+ */
 u64 coluna_masks[64];
+
+/**
+ * @brief Máscaras para linhas do tabuleiro
+ */
 u64 linha_masks[64];
+
+/**
+ * @brief Máscaras para detecção de peões isolados
+ */
 u64 peao_isolado_masks[64];
+
+/**
+ * @brief Máscaras para detecção de peões passados brancos
+ */
 u64 peao_passado_branco_masks[64];
+
+/**
+ * @brief Máscaras para detecção de peões passados pretos
+ */
 u64 peao_passado_preto_masks[64];
 
+// =============================================================================
+// PARÂMETROS DE AVALIAÇÃO POSICIONAL
+// =============================================================================
+
+/**
+ * @brief Bônus por coluna semi-livre para torres
+ */
 int coluna_semilivre_bonus = 6;
+
+/**
+ * @brief Bônus por coluna livre para torres
+ */
 int coluna_livre_bonus = 12;
-int rei_coluna_livre_penalidade = 20;      // Penalidade por rei em coluna livre
-int rei_coluna_semilivre_penalidade = 12;  // Penalidade por rei em coluna semi-livre
 
-// Parâmetros de mobilidade (bônus por movimento legal)
-int mobility_bonus_knight = 4;   // Bônus por movimento de cavalo
-int mobility_bonus_bishop = 5;   // Bônus por movimento de bispo
-int mobility_bonus_rook = 2;     // Bônus por movimento de torre
-int mobility_bonus_queen = 1;    // Bônus por movimento de dama
+/**
+ * @brief Penalidade por rei em coluna livre
+ */
+int rei_coluna_livre_penalidade = 20;
 
-// Parâmetros de segurança do rei
-int king_safety_pawn_shield_bonus = 10;    // Bônus por peão protetor
-int king_safety_open_file_penalty = 15;    // Penalidade por linha/coluna aberta perto do rei
-int king_safety_attacked_square_penalty = 20;  // Penalidade por casa atacada ao redor do rei
-int king_safety_king_attacked_penalty = 50;    // Penalidade por rei diretamente atacado
-// Array para converter índice de casa (0-63) para número da fileira (0-7)
-// ====================================================================
-// Sistema de coordenadas do tabuleiro:
-// - Casa 0 = a1 (fileira 0), Casa 7 = h1 (fileira 0)
-// - Casa 8 = a2 (fileira 1), Casa 15 = h2 (fileira 1)
-// - Casa 56 = a8 (fileira 7), Casa 63 = h8 (fileira 7)
-//
-// Para peões BRANCOS: fileira 0 = posição inicial, fileira 7 = quase promovendo
-// Para peões PRETOS: fileira 7 = posição inicial, fileira 0 = quase promovendo
-//
-// Exemplos de uso:
-// - Casa 12 (e2) → get_linha[12] = 1 (segunda fileira)
-// - Casa 36 (e5) → get_linha[36] = 4 (quinta fileira)
+/**
+ * @brief Penalidade por rei em coluna semi-livre
+ */
+int rei_coluna_semilivre_penalidade = 12;
+
+// =============================================================================
+// PARÂMETROS DE MOBILIDADE
+// =============================================================================
+
+/**
+ * @brief Bônus por movimento legal de cavalo
+ */
+int mobility_bonus_knight = 4;
+
+/**
+ * @brief Bônus por movimento legal de bispo
+ */
+int mobility_bonus_bishop = 5;
+
+/**
+ * @brief Bônus por movimento legal de torre
+ */
+int mobility_bonus_rook = 2;
+
+/**
+ * @brief Bônus por movimento legal de dama
+ */
+int mobility_bonus_queen = 1;
+
+// =============================================================================
+// PARÂMETROS DE SEGURANÇA DO REI
+// =============================================================================
+
+/**
+ * @brief Bônus por peão protetor do rei
+ */
+int king_safety_pawn_shield_bonus = 10;
+
+/**
+ * @brief Penalidade por linha/coluna aberta perto do rei
+ */
+int king_safety_open_file_penalty = 15;
+
+/**
+ * @brief Penalidade por casa atacada ao redor do rei
+ */
+int king_safety_attacked_square_penalty = 20;
+
+/**
+ * @brief Penalidade por rei diretamente atacado
+ */
+int king_safety_king_attacked_penalty = 50;
+
+// =============================================================================
+// SISTEMA DE COORDENADAS DO TABULEIRO
+// =============================================================================
+
+/**
+ * @brief Array para converter índice de casa (0-63) para número da fileira (0-7)
+ * 
+ * Sistema de coordenadas do tabuleiro:
+ * - Casa 0 = a1 (fileira 0), Casa 7 = h1 (fileira 0)
+ * - Casa 8 = a2 (fileira 1), Casa 15 = h2 (fileira 1)
+ * - Casa 56 = a8 (fileira 7), Casa 63 = h8 (fileira 7)
+ *
+ * Para peões BRANCOS: fileira 0 = posição inicial, fileira 7 = quase promovendo
+ * Para peões PRETOS: fileira 7 = posição inicial, fileira 0 = quase promovendo
+ *
+ * Exemplos de uso:
+ * - Casa 12 (e2) → get_linha[12] = 1 (segunda fileira)
+ * - Casa 36 (e5) → get_linha[36] = 4 (quinta fileira)
+ */
 int get_linha[64] = {
     0, 0, 0, 0, 0, 0, 0, 0, // Fileira 1: a1-h1 (fileira 0)
     1, 1, 1, 1, 1, 1, 1, 1, // Fileira 2: a2-h2 (fileira 1)
@@ -73,12 +178,12 @@ int peao_isolado_penalidade = 8;
 // BÔNUS POR PEÕES PASSADOS (valor em centipawns por fileira)
 // Valores reduzidos para não supervalorizar peões passados distantes
 // peao_passado_bonus[0] = 0   (1ª fileira - posição inicial)
-// peao_passado_bonus[1] = 5   (2ª fileira) - antes era 10
-// peao_passado_bonus[2] = 10  (3ª fileira) - antes era 20
-// peao_passado_bonus[3] = 15  (4ª fileira) - antes era 30
-// peao_passado_bonus[4] = 25  (5ª fileira) - antes era 50
-// peao_passado_bonus[5] = 40  (6ª fileira) - antes era 70
-// peao_passado_bonus[6] = 60  (7ª fileira) - antes era 90
+// peao_passado_bonus[1] = 5   (2ª fileira) 
+// peao_passado_bonus[2] = 10  (3ª fileira) 
+// peao_passado_bonus[3] = 15  (4ª fileira) 
+// peao_passado_bonus[4] = 25  (5ª fileira) 
+// peao_passado_bonus[5] = 40  (6ª fileira) 
+// peao_passado_bonus[6] = 60  (7ª fileira) 
 // peao_passado_bonus[7] = 0   (8ª fileira - não há peões aqui)
 int peao_passado_bonus[8] = {0, 5, 10, 15, 25, 40, 60, 0};
 
@@ -91,12 +196,12 @@ int peao_passado_bonus[8] = {0, 5, 10, 15, 25, 40, 60, 0};
 // Tabela de valores posicionais para peões (valores reduzidos)
 int pawn_table[64] = {
     0, 0, 0, 0, 0, 0, 0, 0,         // 1ª fileira (a1-h1)
-    5, 5, 5, -10, -10, 5, 5, 5,     // 2ª fileira (a2-h2) - reduzido de -20 para -10
-    2, -2, -5, 0, 0, -5, -2, 2,     // 3ª fileira (a3-h3) - reduzido pela metade
-    0, 0, 0, 10, 10, 0, 0, 0,       // 4ª fileira (a4-h4) - reduzido de 20 para 10
-    2, 2, 5, 12, 12, 5, 2, 2,       // 5ª fileira (a5-h5) - reduzido pela metade
-    5, 5, 10, 15, 15, 10, 5, 5,     // 6ª fileira (a6-h6) - reduzido pela metade
-    25, 25, 25, 25, 25, 25, 25, 25, // 7ª fileira (a7-h7) - reduzido de 50 para 25
+    5, 5, 5, -10, -10, 5, 5, 5,     // 2ª fileira (a2-h2)
+    2, -2, -5, 0, 0, -5, -2, 2,     // 3ª fileira (a3-h3) 
+    0, 0, 0, 10, 10, 0, 0, 0,       // 4ª fileira (a4-h4)
+    2, 2, 5, 12, 12, 5, 2, 2,       // 5ª fileira (a5-h5)
+    5, 5, 10, 15, 15, 10, 5, 5,     // 6ª fileira (a6-h6) 
+    25, 25, 25, 25, 25, 25, 25, 25, // 7ª fileira (a7-h7) 
     0, 0, 0, 0, 0, 0, 0, 0          // 8ª fileira (a8-h8)
 };
 

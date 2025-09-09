@@ -1,50 +1,177 @@
+/**
+ * @file bitboard.h
+ * @brief Definições e declarações do sistema de bitboards da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este header contém todas as definições fundamentais para o sistema de bitboards,
+ * incluindo macros de manipulação de bits, estruturas de dados, enumerações
+ * de peças e declarações de funções para representação do tabuleiro.
+ */
+
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
 #include <stdio.h>
 #include <string.h> // Para memcpy
 
+// =============================================================================
+// DEFINIÇÕES DE TIPOS
+// =============================================================================
+
+/**
+ * @brief Tipo para bitboards de 64 bits
+ */
 #define u64 unsigned long long
 
-#define getBit(bitboard, casa) ((bitboard & (1ULL << casa)))
-#define setBit(bitboard, casa) (bitboard |= (1ULL << casa))
-#define clearBit(bitboard, casa) (bitboard &= ~(1ULL << casa))
-#define getLeastBitIndex(bitboard) (__builtin_ctzll(bitboard)) // Retorna o índice do bit menos significativo
+// =============================================================================
+// MACROS DE MANIPULAÇÃO DE BITBOARDS
+// =============================================================================
 
+/**
+ * @brief Verifica se um bit está setado em uma casa específica
+ */
+#define getBit(bitboard, casa) ((bitboard & (1ULL << casa)))
+
+/**
+ * @brief Seta um bit em uma casa específica
+ */
+#define setBit(bitboard, casa) (bitboard |= (1ULL << casa))
+
+/**
+ * @brief Limpa um bit em uma casa específica
+ */
+#define clearBit(bitboard, casa) (bitboard &= ~(1ULL << casa))
+
+/**
+ * @brief Retorna o índice do bit menos significativo
+ */
+#define getLeastBitIndex(bitboard) (__builtin_ctzll(bitboard))
+
+// =============================================================================
+// MACROS DE CODIFICAÇÃO/DECODIFICAÇÃO DE LANCES
+// =============================================================================
+
+/**
+ * @brief Codifica um lance com todas suas informações em um inteiro
+ */
 #define codificar_lance(origem, destino, peca, peca_promovida, captura, double_push, en_passant, roque) \
     (origem | (destino << 6) | (peca << 12) | (peca_promovida << 16) | (captura << 20) | (double_push << 21) | (en_passant << 22) | (roque << 23))
 
+/**
+ * @brief Extrai a casa de origem do lance
+ */
 #define get_origem(lance) (lance & 0x3F)
+
+/**
+ * @brief Extrai a casa de destino do lance
+ */
 #define get_destino(lance) ((lance >> 6) & 0x3F)
+
+/**
+ * @brief Extrai o tipo da peça que se move
+ */
 #define get_peca(lance) ((lance >> 12) & 0xF)
+
+/**
+ * @brief Extrai a peça promovida (se houver)
+ */
 #define get_peca_promovida(lance) ((lance >> 16) & 0xF)
-#define get_captura(lance) ((lance & 0x100000) )
-#define get_double_push(lance) ((lance & 0x200000) )
-#define get_en_passant(lance) ((lance & 0x400000) )
-#define get_roque(lance) ((lance & 0x800000) )
 
-extern const char *casa_nome[]; // Mapeamento de casas do tabuleiro
+/**
+ * @brief Verifica se o lance é uma captura
+ */
+#define get_captura(lance) ((lance & 0x100000))
 
+/**
+ * @brief Verifica se o lance é um double push de peão
+ */
+#define get_double_push(lance) ((lance & 0x200000))
 
-// bitboards para peças
-extern u64 bitboards[12]; // bitboards para cada tipo de peça 
-extern u64 ocupacoes[3]; // Ocupações do tabuleiro (brancas, pretas e ambos)
+/**
+ * @brief Verifica se o lance é en passant
+ */
+#define get_en_passant(lance) ((lance & 0x400000))
 
+/**
+ * @brief Verifica se o lance é roque
+ */
+#define get_roque(lance) ((lance & 0x800000))
+
+// =============================================================================
+// DECLARAÇÕES DE VARIÁVEIS GLOBAIS
+// =============================================================================
+
+/**
+ * @brief Nomes das casas em notação algébrica
+ */
+extern const char *casa_nome[];
+
+/**
+ * @brief Bitboards para cada tipo de peça (12 peças)
+ */
+extern u64 bitboards[12];
+
+/**
+ * @brief Ocupações do tabuleiro [branco, preto, ambos]
+ */
+extern u64 ocupacoes[3];
+
+/**
+ * @brief Lado que deve jogar
+ */
 extern int lado_a_jogar;
+
+/**
+ * @brief Casa en passant disponível
+ */
 extern int en_passant;
+
+/**
+ * @brief Direitos de roque
+ */
 extern int roque;
+
+/**
+ * @brief Permissões de roque por casa
+ */
 extern int roque_permissoes[64];
+
+/**
+ * @brief Contador de nós para perft
+ */
 extern long nos;
 
-extern const char pecas_ascii[]; // Representação ASCII das peças
-extern const char *pecas_unicode[]; // Representação Unicode das peças
-extern int pecas_char[]; // Mapeamento de peças para caracteres
-extern const char pecas_promocao[]; // Peças de promoção
+/**
+ * @brief Representação ASCII das peças
+ */
+extern const char pecas_ascii[];
 
+/**
+ * @brief Representação Unicode das peças
+ */
+extern const char *pecas_unicode[];
+
+/**
+ * @brief Mapeamento de peças para caracteres
+ */
+extern int pecas_char[];
+
+/**
+ * @brief Caracteres das peças de promoção
+ */
+extern const char pecas_promocao[];
+
+// =============================================================================
+// ESTRUTURAS DE DADOS
+// =============================================================================
+
+/**
+ * @brief Estrutura para armazenar lista de lances
+ */
 typedef struct {
-    int lances[256]; // array para armazenar os lances gerados
-    int contador; // contador de lances gerados
-
+    int lances[256]; ///< Array para armazenar os lances gerados
+    int contador;    ///< Contador de lances gerados
 } lances;
 
 // Função utilitária

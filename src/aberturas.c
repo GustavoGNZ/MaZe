@@ -27,7 +27,7 @@ int inicializar_livro_aberturas() {
     // Tentar abrir o arquivo de aberturas
     arquivo = fopen("aberturas.txt", "r");
     if (arquivo == NULL) {
-        printf("info string Aviso: arquivo aberturas.txt não encontrado\n");
+        printf("info string Aviso: arquivo aberturas.txt nao encontrado\n");
         return 0;
     }
     
@@ -226,7 +226,7 @@ int buscar_lance_abertura(int historico_lances[], int num_lances_jogados) {
     // Escolher um lance aleatório entre os candidatos
     int indice_escolhido = rand() % num_candidatos;
     
-    printf("info string Lance escolhido do livro: %s (%d opções disponíveis)\n", 
+    printf("info string Lance escolhido do livro: %s (%d opcoes disponiveis)\n", 
            nomes_aberturas[indice_escolhido], num_candidatos);
     
     return candidatos[indice_escolhido];

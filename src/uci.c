@@ -1,3 +1,10 @@
+/*
+ * Implementação do protocolo UCI (Universal Chess Interface)
+ * 
+ * Este arquivo implementa o protocolo UCI para comunicação com interfaces gráficas de xadrez.
+ * Contém funções de parsing, utilitários de conversão de lances e o loop principal do UCI.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -9,21 +16,19 @@
 #include "../include/evaluate.h"
 #include "../include/aberturas.h"
 
+// Posição inicial padrão em notação FEN
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-/**
- * @brief Converte um lance interno para string UCI
- *
- * @param lance Lance no formato interno
- * @param buffer Buffer para armazenar a string UCI
- */
 void lance_para_uci(int lance, char* buffer) {
+    // Extract move components from internal format
     int origem = get_origem(lance);
     int destino = get_destino(lance);
     int promocao = get_peca_promovida(lance);
     
+    // Create basic move string (e.g., "e2e4")
     sprintf(buffer, "%s%s", casa_nome[origem], casa_nome[destino]);
     
+    // Add promotion character if this is a promotion move
     if (promocao) {
         char promo_char;
         switch (promocao) {
@@ -41,15 +46,6 @@ void lance_para_uci(int lance, char* buffer) {
     }
 }
 
-/**
- * @brief Função para analisar um lance no formato UCI
- *
- * Converte uma string de lance UCI (e2e4, g1f3, e7e8q, etc.) para
- * o formato interno do engine.
- *
- * @param string_lance String contendo o lance no formato UCI
- * @return Código do lance no formato interno ou -1 se inválido
- */
 int parse_move(char *string_lance)
 {
     lances listaLances[1];
@@ -348,3 +344,4 @@ void uci_loop()
         }
     }
 }
+

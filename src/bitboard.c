@@ -1,39 +1,102 @@
+/**
+ * @file bitboard.c
+ * @brief Implementação do sistema de bitboards da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo contém a implementação completa do sistema de bitboards,
+ * incluindo representação do tabuleiro, parsing de FEN, geração de lances,
+ * execução de movimentos e funções de teste de performance (perft).
+ */
+
 #include "../include/bitboard.h"
 #include "../include/ataques.h"
 #include "../include/evaluate.h"
 #include <string.h>
 
+// =============================================================================
+// VARIÁVEIS GLOBAIS DO ESTADO DO JOGO
+// =============================================================================
+
+/**
+ * @brief Bitboards para cada tipo de peça (12 peças: 6 brancas + 6 pretas)
+ */
 u64 bitboards[12];
+
+/**
+ * @brief Bitboards de ocupação [branco, preto, ambos]
+ */
 u64 ocupacoes[3];
 
+/**
+ * @brief Lado que deve jogar (0=branco, 1=preto)
+ */
 int lado_a_jogar;
-int en_passant = -999; // Valor padrão para indicar que não há en passant
-int roque = 0; // Valor padrão para indicar que não há roque
 
+/**
+ * @brief Casa en passant disponível (-999 = nenhuma)
+ */
+int en_passant = -999;
+
+/**
+ * @brief Direitos de roque (bitfield)
+ */
+int roque = 0;
+
+// =============================================================================
+// TABELAS DE CONFIGURAÇÃO
+// =============================================================================
+
+/**
+ * @brief Permissões de roque por casa - usado para remover direitos quando peças se movem
+ * 
+ * Valores especiais:
+ * - 13 = remove roque dama branca (torre a1)
+ * - 12 = remove ambos roques brancos (rei e1)  
+ * - 14 = remove roque rei branco (torre h1)
+ * - 7 = remove roque dama preta (torre a8)
+ * - 3 = remove ambos roques pretos (rei e8)
+ * - 11 = remove roque rei preto (torre h8)
+ * - 15 = não remove nenhum roque
+ */
 int roque_permissoes[64] = {
-    13,15,15,15,12,15,15,14,  // Linha 1: a1=13(remove Q), e1=12(remove KQ), h1=14(remove K)
+    13,15,15,15,12,15,15,14,  // Linha 1
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
     15,15,15,15,15,15,15,15,
-    7,15,15,15,3,15,15,11    // Linha 8: a8=7(remove q), e8=3(remove kq), h8=11(remove k)
+    7,15,15,15,3,15,15,11     // Linha 8
 };
 
+/**
+ * @brief Representação ASCII das peças para display
+ */
 const char pecas_ascii[] = {
     'P', 'N', 'B', 'R', 'Q', 'K', // Peças brancas
     'p', 'n', 'b', 'r', 'q', 'k'  // Peças pretas
 };
 
+/**
+ * @brief Representação Unicode das peças para display avançado
+ */
 const char *pecas_unicode[] = {
     "♟", "♞", "♝", "♜", "♛", "♚", // Peças brancas
     "♙", "♘", "♗", "♖", "♕", "♔"  // Peças pretas
 };
 
+/**
+ * @brief Mapeamento de peças para caracteres
+ */
 int pecas_char[] = {
-    [P] = 'P', [N] = 'N', [B] = 'B', [R] = 'R', [Q] = 'Q', [K] = 'K', [p] = 'p', [n] = 'n', [b] = 'b', [r] = 'r', [q] = 'q', [k] = 'k'};
+    [P] = 'P', [N] = 'N', [B] = 'B', [R] = 'R', [Q] = 'Q', [K] = 'K', 
+    [p] = 'p', [n] = 'n', [b] = 'b', [r] = 'r', [q] = 'q', [k] = 'k'
+};
 
+/**
+ * @brief Nomes das casas do tabuleiro em notação algébrica
+ */
 const char *casa_nome[] = {
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
     "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
@@ -42,16 +105,40 @@ const char *casa_nome[] = {
     "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5",
     "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
     "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
-    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"};
+    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
+};
 
-const char pecas_promocao[] = {[Q] = 'q', [R] = 'r', [B] = 'b', [N] = 'n', [q] = 'q', [r] = 'r', [b] = 'b', [n] = 'n'}; // Peças de promoção para peões
+/**
+ * @brief Caracteres das peças de promoção
+ */
+const char pecas_promocao[] = {
+    [Q] = 'q', [R] = 'r', [B] = 'b', [N] = 'n', 
+    [q] = 'q', [r] = 'r', [b] = 'b', [n] = 'n'
+};
 
+/**
+ * @brief Contador de nós para função perft
+ */
 long nos;
 
-// Imprime o bitboard que representa o tabuleiro de xadrez.
+// =============================================================================
+// FUNÇÕES DE VISUALIZAÇÃO E DEBUG
+// =============================================================================
+
+// =============================================================================
+// FUNÇÕES DE VISUALIZAÇÃO E DEBUG
+// =============================================================================
+
+/**
+ * @brief Imprime um bitboard na forma visual do tabuleiro
+ * 
+ * Exibe o bitboard como um tabuleiro 8x8, onde 1 representa
+ * bits setados e 0 representa bits não setados.
+ * 
+ * @param bitboard Bitboard a ser impresso
+ */
 void printBitboard(u64 bitboard)
 {
-
     for (int linha = 7; linha >= 0; linha--)
     {
         printf(" %d ", linha + 1);
@@ -76,6 +163,12 @@ void printBitboard(u64 bitboard)
     printf("\n Bitboard: %lld\n", bitboard);
 }
 
+/**
+ * @brief Imprime o tabuleiro atual com todas as peças e informações do jogo
+ * 
+ * Exibe o tabuleiro completo mostrando todas as peças em suas posições,
+ * além de informações sobre turno, en passant, direitos de roque e score.
+ */
 void printTabuleiro()
 {
     for (int linha = 7; linha >= 0; linha--)
@@ -121,13 +214,6 @@ void printTabuleiro()
     printf("En passant: %s\n", (en_passant != -999) ? casa_nome[en_passant] : "Nenhum");
 
     printf("Roque: ");
-    // Exibe roques de forma compacta: KQkq (K=branco rei, Q=branco dama, k=preto rei, q=preto dama)
-    // printf("%d\n", roque);
-    // printf("%d\n", roque & reiBranco_alaRei);
-    // printf("%d\n", roque & reiBranco_alaDama);
-    // printf("%d\n", roque & reiPreto_alaRei);
-    // printf("%d\n", roque & reiPreto_alaDama);
-
 
     printf("%c", (roque & reiBranco_alaRei)     ? 'K' : '-');
     printf("%c", (roque & reiBranco_alaDama)    ? 'Q' : '-');
@@ -138,6 +224,14 @@ void printTabuleiro()
     printf("Score: %d\n", evaluate());
 }
 
+/**
+ * @brief Imprime um mapa visual das casas atacadas por um lado
+ * 
+ * Exibe o tabuleiro mostrando quais casas estão sendo atacadas
+ * pelo lado especificado (1 = atacada, 0 = não atacada).
+ * 
+ * @param lado Lado que ataca (branco ou preto)
+ */
 void printCasasAtacadasPeloLado(int lado){
     printf("\n");
     
@@ -166,8 +260,18 @@ void printCasasAtacadasPeloLado(int lado){
     printf("\n     a b c d e f g h\n\n");
 }
 
-// Analisador sintático de FEN (Forsyth-Edwards Notation).
-// Esta função deve ser implementada para interpretar a notação FEN e configurar o tabuleiro 
+// =============================================================================
+// FUNÇÕES DE PARSING E CONFIGURAÇÃO DO TABULEIRO
+// =============================================================================
+
+/**
+ * @brief Analisador sintático de FEN (Forsyth-Edwards Notation)
+ * 
+ * Interpreta uma string FEN e configura o tabuleiro de acordo.
+ * Formato FEN: "peças lado-a-jogar direitos-roque en-passant contador-50-regra número-lance"
+ * 
+ * @param fen String FEN a ser analisada
+ */
 void parseFEN(char *fen){
     // Inicializa os bitboards e ocupações vazios e variaveis de estado do jogo
     memset(bitboards, 0ULL, sizeof(bitboards));

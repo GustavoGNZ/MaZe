@@ -56,11 +56,47 @@ void parse_position(char *string_posicao);
  * 
  * Analisa e executa o comando de busca UCI. Processa parâmetros como
  * tempo de busca, profundidade, número de nós e outros controles.
+ * Suporta parâmetros como:
+ * - wtime/btime: Tempo restante para brancas/pretas
+ * - winc/binc: Incremento de tempo por lance
+ * - depth: Profundidade máxima de busca
+ * - nodes: Número máximo de nós a examinar
+ * - movetime: Tempo fixo para o lance
+ * - infinite: Busca infinita até comando "stop"
  * 
  * @param string_go String completa do comando go
  */
 void parse_go(char *string_go);
 
+/**
+ * @brief Converte um lance interno para string UCI
+ * 
+ * Transforma o formato interno de lance da engine para a notação
+ * UCI padrão. Inclui tratamento especial para promoções.
+ * 
+ * @param lance Lance no formato interno
+ * @param buffer Buffer para armazenar a string UCI (mínimo 6 chars)
+ */
+void lance_para_uci(int lance, char* buffer);
+
+// =============================================================================
+// FUNÇÃO PRINCIPAL UCI
+// =============================================================================
+
+/**
+ * @brief Loop principal do protocolo UCI
+ * 
+ * Função principal que implementa o protocolo UCI completo.
+ * Processa comandos da entrada padrão e responde conforme o protocolo:
+ * - uci: Identifica o engine
+ * - isready: Confirma que engine está pronto
+ * - position: Configura posição do tabuleiro
+ * - go: Inicia busca
+ * - stop: Para busca atual
+ * - quit: Encerra engine
+ * 
+ * Mantém loop até receber comando "quit".
+ */
 void uci_loop();
 
 #endif

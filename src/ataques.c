@@ -1,3 +1,14 @@
+/**
+ * @file ataques.c
+ * @brief Sistema de geração de ataques e lances da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo contém a implementação completa do sistema de geração de ataques
+ * e lances, incluindo magic bitboards, geração de números aleatórios, cálculo
+ * de ataques para todas as peças e geração de movimentos legais.
+ */
+
 #include "../include/ataques.h"
 #include "../include/globals.h"
 #include "../include/bitboard.h"
@@ -7,7 +18,18 @@
 #include <string.h>
 #include <sys/time.h>
 
+// =============================================================================
+// FUNÇÕES DE TEMPO E NÚMEROS ALEATÓRIOS
+// =============================================================================
 
+/**
+ * @brief Obtém o tempo atual em milissegundos
+ * 
+ * Função multiplataforma para obter timestamp em milissegundos,
+ * usada para medição de performance e seeds aleatórias.
+ * 
+ * @return Tempo atual em milissegundos
+ */
 int get_tempo_milisegundos()
 {
     struct timeval tv;
@@ -15,10 +37,19 @@ int get_tempo_milisegundos()
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
-// Variável global para armazenar o estado do gerador de números aleatórios
+/**
+ * @brief Estado global do gerador de números aleatórios
+ */
 unsigned int num_aleatorio = 1804289383;
 
-// Gera um número aleatório usando xorshift32 (um gerador de números pseudo-aleatórios) foi criado assim para rodar em windows e linux pela diferenca na funcao rand() e random()
+/**
+ * @brief Gera um número aleatório de 32 bits usando xorshift32
+ * 
+ * Implementação de gerador pseudo-aleatório xorshift32 para garantir
+ * comportamento consistente entre Windows e Linux (diferenças em rand()).
+ * 
+ * @return Número aleatório de 32 bits
+ */
 unsigned int gerarNumeroAleatorio32bits()
 {
     unsigned int num = num_aleatorio;
@@ -501,7 +532,6 @@ u64 set_occupancy(int index, int qtde_bits, u64 mask)
 
 void runEngine()
 {
-    // adicionar funcoes futuras que precisam ser inicializadas
 
     inicializarAtaquesPecas();
     init_evaluation_masks();

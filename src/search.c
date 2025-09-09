@@ -1,17 +1,73 @@
+/**
+ * @file search.c
+ * @brief Sistema de busca da engine MaZe
+ * @author GustavoGNZ
+ * @version 1.0
+ * 
+ * Este arquivo implementa o algoritmo de busca alfa-beta com várias otimizações,
+ * incluindo variação principal (PV), killer moves, history heuristic,
+ * quiescence search e controle de tempo.
+ */
+
 #include "../include/search.h"
 #include "../include/evaluate.h"
 #include "../include/bitboard.h"
 #include "../include/globals.h"
 #include "../include/ataques.h"
 
+// =============================================================================
+// VARIÁVEIS GLOBAIS DE BUSCA
+// =============================================================================
+
+/**
+ * @brief Profundidade atual da busca (ply)
+ */
 int ply;
 
 #define MAX_PLY 64
 
-// Array para detectar repetição na linha de busca atual
+/**
+ * @brief Array para detectar repetição na linha de busca atual
+ */
 u64 hash_linha_busca[MAX_PLY_BUSCA];
 
-// Função para detectar repetição na linha de busca atual
+/**
+ * @brief Tabela de killer moves [índice][profundidade]
+ */
+int killer_moves[2][MAX_PLY];
+
+/**
+ * @brief Tabela de history moves [peça][casa]
+ */
+int history_moves[12][MAX_PLY];
+
+/**
+ * @brief Comprimento da variação principal em cada profundidade
+ */
+int pv_length[MAX_PLY];
+
+/**
+ * @brief Tabela triangular da variação principal
+ */
+int pv_table[MAX_PLY][MAX_PLY];
+
+/**
+ * @brief Flags para controle da variação principal
+ */
+int follow_pv, score_pv;
+
+// =============================================================================
+// FUNÇÕES DE DETECÇÃO DE REPETIÇÃO
+// =============================================================================
+
+/**
+ * @brief Detecta repetição na linha de busca atual
+ * 
+ * Verifica se a posição atual já apareceu anteriormente na
+ * linha de busca, indicando uma possível repetição.
+ * 
+ * @return 1 se repetição detectada, 0 caso contrário
+ */
 int detectar_repeticao_busca() {
     u64 hash_atual = hash_posicao_simples();
     
@@ -24,14 +80,18 @@ int detectar_repeticao_busca() {
     return 0; // Não é repetição
 }
 
-int killer_moves[2][MAX_PLY];
-int history_moves[12][MAX_PLY];
+// =============================================================================
+// FUNÇÕES DE VARIAÇÃO PRINCIPAL (PV)
+// =============================================================================
 
-int pv_length[MAX_PLY];
-int pv_table[MAX_PLY][MAX_PLY];
-
-int follow_pv, score_pv;
-
+/**
+ * @brief Habilita pontuação para seguir a variação principal
+ * 
+ * Verifica se algum lance na lista corresponde ao lance da PV
+ * na profundidade atual e configura flags apropriadas.
+ * 
+ * @param listaLances Lista de lances a verificar
+ */
 void enable_pv_scoring(lances *listaLances) {
     follow_pv = 0;
 
@@ -45,9 +105,11 @@ void enable_pv_scoring(lances *listaLances) {
 }
 
 /*
-TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
-
-A tabela triangular da variação principal é uma estrutura de dados usada em motores de xadrez
+ * =============================================================================
+ * TABELA TRIANGULAR DA VARIAÇÃO PRINCIPAL (PV Table)
+ * =============================================================================
+ * 
+ * A tabela triangular da variação principal é uma estrutura de dados usada em motores de xadrez
 para armazenar e recuperar a melhor sequência de lances encontrada durante a busca.
 
 ESTRUTURA:
