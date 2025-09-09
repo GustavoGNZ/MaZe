@@ -104,8 +104,6 @@ MaZe/
 - **`evaluate.h/.c`**: Avaliação material, posicional e segurança do rei
 - **`uci.h/.c`**: Protocolo padrão para comunicação com GUIs
 - **`globals.h/.c`**: Estado global, repetição e dados compartilhados
-## 🎯 Capacidades da Engine
-
 ---
 
 ## ⚙️ Compilação e Uso
@@ -161,7 +159,9 @@ go depth 8                            # Buscar até profundidade 8
 go movetime 5000                      # Buscar por 5 segundos
 go infinite                           # Busca contínua (análise)
 ---
-## 📜 Licença
+```
+
+### 📜 Licença
 
 Veja o arquivo LICENSE para detalhes.
 
