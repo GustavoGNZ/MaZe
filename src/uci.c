@@ -7,6 +7,7 @@
 #include "../include/uci.h"
 #include "../include/search.h"
 #include "../include/evaluate.h"
+#include "../include/aberturas.h"
 
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -112,7 +113,7 @@ void parse_position(char *string_posicao)
     char *token = string_posicao;
 
     // Limpa o histórico da partida ao configurar nova posição
-    // limpar_historico_partida();
+    num_lances_partida = 0;
 
     if (strncmp(string_posicao, "startpos", 8) == 0)
     {
@@ -167,17 +168,18 @@ void parse_position(char *string_posicao)
                 if (lance != 0)
                 {
                     // Adiciona o lance ao histórico da partida
-                    // adicionar_lance_historico(lance_str);
+                    if (num_lances_partida < MAX_LANCES_PARTIDA) {
+                        historico_lances_partida[num_lances_partida] = lance;
+                        num_lances_partida++;
+                    }
                     
                     if (!fazer_lance(lance, todosLances, backup_global))
                     {
-                        // printf("Erro ao executar lance: %s\n", lance_str);
                         break; // Erro ao executar lance
                     }
                 }
                 else
                 {
-                    // printf("Lance inválido: %s\n", lance_str);
                     break; // Lance inválido
                 }
             }
@@ -194,33 +196,98 @@ void parse_position(char *string_posicao)
 void parse_go(char *string_go)
 {
     int profundidade = -1;
+    int tempo_branco = -1, tempo_preto = -1;
+    int inc_branco = 0, inc_preto = 0;
+    int movetime = -1;
+    int infinite = 0;
 
-    char *profundidade_atual = NULL;
+    char *token = NULL;
 
-    if ((profundidade_atual = strstr(string_go, "depth")))
+    // Parse depth
+    if ((token = strstr(string_go, "depth")))
     {
-        profundidade = atoi(profundidade_atual + 6);
-    }
-    else
-    {
-        profundidade = 6; // valor padrão
+        profundidade = atoi(token + 6);
     }
 
-    // // Primeiro, consulta o livro de aberturas
-    // char* lance_livro = consultar_livro_aberturas();
-    
-    // if (lance_livro != NULL) {
-    //     // Verifica se o lance do livro é válido na posição atual
-    //     int lance_interno = parse_move(lance_livro);
+    // Parse wtime (tempo das brancas em ms)
+    if ((token = strstr(string_go, "wtime")))
+    {
+        tempo_branco = atoi(token + 6);
+    }
+
+    // Parse btime (tempo das pretas em ms)  
+    if ((token = strstr(string_go, "btime")))
+    {
+        tempo_preto = atoi(token + 6);
+    }
+
+    // Parse winc (incremento das brancas em ms)
+    if ((token = strstr(string_go, "winc")))
+    {
+        inc_branco = atoi(token + 5);
+    }
+
+    // Parse binc (incremento das pretas em ms)
+    if ((token = strstr(string_go, "binc")))
+    {
+        inc_preto = atoi(token + 5);
+    }
+
+    // Parse movetime (tempo fixo para o lance em ms)
+    if ((token = strstr(string_go, "movetime")))
+    {
+        movetime = atoi(token + 9);
+    }
+
+    // Parse infinite
+    if (strstr(string_go, "infinite"))
+    {
+        infinite = 1;
+    }
+
+    // PRIMEIRO: Consultar livro de aberturas
+    if (livro_aberturas.inicializado) {
+        int lance_livro = buscar_lance_abertura(historico_lances_partida, num_lances_partida);
         
-    //     if (lance_interno != 0) {
-    //         printf("bestmove %s\n", lance_livro);
-    //         return;
-    //     } else {
-    //         printf("info string Lance do livro inválido: %s\n", lance_livro);
-    //     }
-    // }
-    
+        if (lance_livro != 0) {
+            // Verificar se o lance é válido na posição atual
+            lances listaLances[1];
+            gerar_lances(listaLances);
+            
+            for (int i = 0; i < listaLances->contador; i++) {
+                if (listaLances->lances[i] == lance_livro) {
+                    printf("bestmove ");
+                    printLance(lance_livro);
+                    printf("\n");
+                    fflush(stdout);
+                    return;
+                }
+            }
+            printf("info string Lance do livro inválido na posição atual\n");
+        }
+    }
+
+    // Configurar controle de tempo
+    if (infinite) {
+        // Busca infinita - sem limite de tempo
+        // controle_tempo.tempo_total = 0;
+        profundidade = (profundidade == -1) ? 64 : profundidade;
+    } else if (movetime > 0) {
+        // Tempo fixo por lance
+        // controle_tempo.tempo_total = movetime;
+        // controle_tempo.incremento = 0;
+        // controle_tempo.tempo_restante = movetime;
+        profundidade = 64; // Buscar até o tempo esgotar
+    } else if (tempo_branco > 0 || tempo_preto > 0) {
+        // Controle de tempo normal
+        // init_tempo(tempo_branco, tempo_preto, inc_branco, inc_preto);
+        profundidade = 64; // Buscar até o tempo esgotar
+    } else {
+        // Sem parâmetros de tempo - usar profundidade padrão
+        // controle_tempo.tempo_total = 0;
+        profundidade = (profundidade == -1) ? 6 : profundidade;
+    }
+
     // Se não encontrou no livro, faz busca normal
     busca_lance(profundidade);
 }
@@ -232,7 +299,7 @@ void uci_loop()
     setbuf(stdin, NULL);  // Desabilita buffering na entrada padrão
 
     // Carrega o livro de aberturas na inicialização
-    // carregar_livro_aberturas("aberturas.txt");
+    inicializar_livro_aberturas();
 
     char comando[4096];
     while (1)

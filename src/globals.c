@@ -7,6 +7,10 @@ estado_jogo backup_global;
 u64 historico_posicoes[MAX_HISTORIA];
 int contador_historia = 0;
 
+// Histórico de lances para livro de aberturas
+int historico_lances_partida[MAX_LANCES_PARTIDA];
+int num_lances_partida = 0;
+
 u64 tabela_ataques_peao[2][64];
 u64 tabela_ataques_cavalo[64];
 u64 tabela_ataques_rei[64];

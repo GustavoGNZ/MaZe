@@ -24,17 +24,9 @@
 
 int main()
 {
-    u64 tabuleiro = 0ULL;
-
     runEngine();
-    parseFEN(posicaoInicial);
-    printTabuleiro();
+
+    uci_loop();
     
-    // lances listaLances[1];
-    // gerar_lances(listaLances);
-    // sort_moves(listaLances);
-
-    // uci_loop();
-
     return 0;
 }
