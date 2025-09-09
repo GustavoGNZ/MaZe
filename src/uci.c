@@ -11,6 +11,36 @@
 #define posicaoInicial "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 /**
+ * @brief Converte um lance interno para string UCI
+ *
+ * @param lance Lance no formato interno
+ * @param buffer Buffer para armazenar a string UCI
+ */
+void lance_para_uci(int lance, char* buffer) {
+    int origem = get_origem(lance);
+    int destino = get_destino(lance);
+    int promocao = get_peca_promovida(lance);
+    
+    sprintf(buffer, "%s%s", casa_nome[origem], casa_nome[destino]);
+    
+    if (promocao) {
+        char promo_char;
+        switch (promocao) {
+            case Q: case q: promo_char = 'q'; break;
+            case R: case r: promo_char = 'r'; break;
+            case B: case b: promo_char = 'b'; break;
+            case N: case n: promo_char = 'n'; break;
+            default: promo_char = '\0'; break;
+        }
+        if (promo_char) {
+            int len = strlen(buffer);
+            buffer[len] = promo_char;
+            buffer[len + 1] = '\0';
+        }
+    }
+}
+
+/**
  * @brief Função para analisar um lance no formato UCI
  *
  * Converte uma string de lance UCI (e2e4, g1f3, e7e8q, etc.) para
@@ -81,6 +111,9 @@ void parse_position(char *string_posicao)
 
     char *token = string_posicao;
 
+    // Limpa o histórico da partida ao configurar nova posição
+    // limpar_historico_partida();
+
     if (strncmp(string_posicao, "startpos", 8) == 0)
     {
         parseFEN(posicaoInicial);
@@ -133,6 +166,9 @@ void parse_position(char *string_posicao)
 
                 if (lance != 0)
                 {
+                    // Adiciona o lance ao histórico da partida
+                    // adicionar_lance_historico(lance_str);
+                    
                     if (!fazer_lance(lance, todosLances, backup_global))
                     {
                         // printf("Erro ao executar lance: %s\n", lance_str);
@@ -170,10 +206,23 @@ void parse_go(char *string_go)
         profundidade = 6; // valor padrão
     }
 
-    busca_lance(profundidade);
-
+    // // Primeiro, consulta o livro de aberturas
+    // char* lance_livro = consultar_livro_aberturas();
     
-
+    // if (lance_livro != NULL) {
+    //     // Verifica se o lance do livro é válido na posição atual
+    //     int lance_interno = parse_move(lance_livro);
+        
+    //     if (lance_interno != 0) {
+    //         printf("bestmove %s\n", lance_livro);
+    //         return;
+    //     } else {
+    //         printf("info string Lance do livro inválido: %s\n", lance_livro);
+    //     }
+    // }
+    
+    // Se não encontrou no livro, faz busca normal
+    busca_lance(profundidade);
 }
 
 void uci_loop()
@@ -181,6 +230,9 @@ void uci_loop()
 
     setbuf(stdout, NULL); // Desabilita buffering na saída padrão
     setbuf(stdin, NULL);  // Desabilita buffering na entrada padrão
+
+    // Carrega o livro de aberturas na inicialização
+    // carregar_livro_aberturas("aberturas.txt");
 
     char comando[4096];
     while (1)
@@ -207,8 +259,8 @@ void uci_loop()
         else if (strcmp(comando, "ucinewgame") == 0)
         {
             // Reinicia o jogo para uma nova partida
+            // limpar_historico_partida();
             parse_position("position startpos");
-            // printTabuleiro();
         }
         else if (strncmp(comando, "isready", 7) == 0)
         {

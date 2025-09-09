@@ -556,13 +556,11 @@ int evaluate_open_files()
         {
             // Coluna livre
             score += coluna_livre_bonus;
-            printf("Coluna livre para brancas na coluna %d\n", coluna);
         }
         else if (!tem_peoes_brancos && tem_peoes_pretos)
         {
             // Coluna semi-livre para brancas
             score += coluna_semilivre_bonus;
-            printf("Coluna semi-livre para brancas na coluna %d\n", coluna);
         }
         
         clearBit(torres_brancas, casa);
@@ -584,13 +582,11 @@ int evaluate_open_files()
         {
             // Coluna livre
             score -= coluna_livre_bonus;
-            printf("Coluna livre para pretas na coluna %d\n", coluna);
         }
         else if (tem_peoes_brancos && !tem_peoes_pretos)
         {
             // Coluna semi-livre para pretas
             score -= coluna_semilivre_bonus;
-            printf("Coluna semi-livre para pretas na coluna %d\n", coluna);
         }
         
         clearBit(torres_pretas, casa);
@@ -669,13 +665,11 @@ int evaluate_open_files()
         {
             // Rei em coluna livre = muito perigoso
             score -= rei_coluna_livre_penalidade;
-            printf("Rei branco vulnerável em coluna livre %d\n", coluna);
         }
         else if (!tem_peoes_brancos && tem_peoes_pretos)
         {
             // Rei em coluna semi-livre = perigoso
             score -= rei_coluna_semilivre_penalidade;
-            printf("Rei branco vulnerável em coluna semi-livre %d\n", coluna);
         }
     }
     
@@ -695,13 +689,11 @@ int evaluate_open_files()
         {
             // Rei em coluna livre = muito perigoso para pretas = bônus para brancas
             score += rei_coluna_livre_penalidade;
-            printf("Rei preto vulnerável em coluna livre %d\n", coluna);
         }
         else if (tem_peoes_brancos && !tem_peoes_pretos)
         {
             // Rei em coluna semi-livre = perigoso para pretas = bônus para brancas
             score += rei_coluna_semilivre_penalidade;
-            printf("Rei preto vulnerável em coluna semi-livre %d\n", coluna);
         }
     }
     
