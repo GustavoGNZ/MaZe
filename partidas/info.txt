@@ -1,0 +1,2 @@
+./ordo -p arena.pgn -o resultado.txt
+
